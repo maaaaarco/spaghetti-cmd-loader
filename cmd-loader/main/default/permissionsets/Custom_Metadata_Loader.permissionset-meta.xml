@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>CMDLoaderController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Custom Metadata Loader</label>
+    <license>Salesforce</license>
+    <tabSettings>
+        <tab>Custom_Metadata_Loader</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>
