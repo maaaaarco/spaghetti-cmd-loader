@@ -1,0 +1,18 @@
+{
+  "orgName": "CMDLoaderLwc",
+  "edition": "Developer",
+  "features": ["AuthorApex"],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "securitySettings": {
+      "sessionSettings": {
+        "forceRelogin": false
+      }
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": false
+    }
+  }
+}
