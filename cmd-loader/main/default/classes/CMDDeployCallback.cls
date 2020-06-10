@@ -9,6 +9,7 @@
  * Invoked after a Metadata Api deployment completes (successfully or not), post the result on the
  * user (who triggered the deployment) chatter feed
  */
+@NamespaceAccessible
 public inherited sharing class CMDDeployCallback implements Metadata.DeployCallback {
   static final Integer MAX_FAILURES = 20;
 
