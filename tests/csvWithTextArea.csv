@@ -1,0 +1,16 @@
+"DeveloperName","MasterLabel","spaghettiCMD__CheckboxField__c","spaghettiCMD__DateField__c","spaghettiCMD__DateTimeField__c","spaghettiCMD__LongField__c","spaghettiCMD__IntegerField__c","spaghettiCMD__DecimalField__c","spaghettiCMD__PercentageField__c","spaghettiCMD__PhoneField__c","spaghettiCMD__PicklistField__c","spaghettiCMD__TextField__c","spaghettiCMD__TextAreaField__c","spaghettiCMD__TextAreaLong__c","spaghettiCMD__UrlField__c"
+"Record_1","Record 1","true","2020-06-10","2020-06-10 19:23:00","123456789009876540","123456","123456654","9999","+491234567890","Value 1","this is a text field","text area line 1
+text area line 2","text area long line 1
+text area long line 2
+text area long line 3
+text area long line 4","https://developer.salesforce.com/"
+"Record_3","Record 3","true","2020-06-10","2020-06-10 19:23:00","123456789009876540","123456","123456654","9999","+491234567890","Value 1","this is a text field","text area line 1
+text area line 2","text area long line 1
+text area long line 2
+text area long line 3
+text area long line 4","https://developer.salesforce.com/"
+"Record_2","Record 2","true","2020-06-10","2020-06-10 19:23:00","123456789009876540","123456","123456654","9999","+491234567890","Value 1","this is a text field","text area line 1
+text area line 2","text area long line 1
+text area long line 2
+text area long line 3
+text area long line 4","https://developer.salesforce.com/"
