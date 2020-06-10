@@ -3,6 +3,11 @@ Create or Update Custom Metadata Type records from CSV file
 
 # Installation Options
 
+<a href="https://githubsfdeploy.herokuapp.com/app/githubdeploy/maaaaarco/spaghetti-cmd-loader">
+  <img alt="Deploy to Salesforce"
+       src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
+</a>
+
 ## As Unlocked package
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```
