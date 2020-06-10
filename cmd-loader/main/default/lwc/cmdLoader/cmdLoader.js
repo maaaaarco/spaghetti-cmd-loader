@@ -12,7 +12,6 @@ import PapaParse from "@salesforce/resourceUrl/PapaParse";
 import { loadScript } from "lightning/platformResourceLoader";
 import upsertRecords from "@salesforce/apex/CMDLoaderController.upsertRecords";
 import checkDeployment from "@salesforce/apex/CMDLoaderController.checkDeployment";
-
 export default class CmdLoader extends LightningElement {
   @track cmdTypes = [];
   @track cmdRecords = [];

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <name>Layout</name>
+    <members>My_Custom_Metadata_Type__mdt-My Custom Metadata Type Layout</members>
+  </types>
+  <types>
+    <name>CustomObject</name>
+    <members>My_Custom_Metadata_Type__mdt</members>
+  </types>
+  <types>
+    <name>CustomField</name>
+    <members>My_Custom_Metadata_Type__mdt.CheckboxField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.DateField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.DateTimeField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.DecimalField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.IntegerField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.LongField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.PercentageField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.PhoneField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.PicklistField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.TextAreaField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.TextAreaLong__c</members>
+    <members>My_Custom_Metadata_Type__mdt.TextField__c</members>
+    <members>My_Custom_Metadata_Type__mdt.UrlField__c</members>
+  </types>
+  <version>48.0</version>
+</Package>

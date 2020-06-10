@@ -51,6 +51,7 @@ public with sharing class CMDLoaderController {
       SELECT QualifiedApiName
       FROM EntityDefinition
       WHERE IsCustomizable = true AND KeyPrefix LIKE 'm%'
+      ORDER BY QualifiedApiName ASC
     ]) {
       if (ed.QualifiedApiName.endsWithIgnoreCase(CMDConstants.MDT_SUFFIX)) {
         res.add(ed.QualifiedApiName);
@@ -110,70 +111,76 @@ public with sharing class CMDLoaderController {
     Id deployJobId = null;
 
     try {
-      String cmdTypeBaseName = cmdType.replace(CMDConstants.MDT_SUFFIX, '');
       Schema.DescribeSObjectResult objMetadata = Schema.describeSObjects(
         new List<String>{ cmdType }
       )[0];
+      
       Map<String, Schema.SObjectField> fieldMap = objMetadata.fields.getMap();
+      
+      // component's name without __mdt suffix, used to set fullName attribute on records
+      final String cmdTypeBaseName = cmdType.replace(CMDConstants.MDT_SUFFIX, '');
 
+      // deploy container
       Metadata.DeployContainer container = new Metadata.DeployContainer();
-      for (RecordWrapper wrapper : records) {
-        Metadata.CustomMetadata customMetadata = new Metadata.CustomMetadata();
+      
+      for (RecordWrapper recordWrapper : records) {
+        Metadata.CustomMetadata customMetadataRecord = new Metadata.CustomMetadata();
 
-        for (FieldWrapper field : wrapper.fields) {
-          if (field.fieldName == CMDConstants.DEVELOPER_NAME_FIELD_NAME) {
-            customMetadata.fullName = cmdTypeBaseName + '.' + field.fieldValue;
+        for (FieldWrapper fieldWrapper : recordWrapper.fields) {
+          if (fieldWrapper.fieldName == CMDConstants.DEVELOPER_NAME_FIELD_NAME) {
+            customMetadataRecord.fullName = cmdTypeBaseName + '.' + fieldWrapper.fieldValue;
           } else if (
-            CMDConstants.MASTER_LABEL_FIELD_NAMES.contains(field.fieldName)
+            CMDConstants.MASTER_LABEL_FIELD_NAMES.contains(fieldWrapper.fieldName)
           ) {
-            customMetadata.label = field.fieldValue;
+            customMetadataRecord.label = fieldWrapper.fieldValue;
           } else {
-            Schema.DisplayType fieldType = fieldMap.get(field.fieldName)
+            Schema.DisplayType fieldType = fieldMap.get(fieldWrapper.fieldName)
               .getDescribe()
               .getType();
             Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
-            customField.field = field.fieldName;
+            customField.field = fieldWrapper.fieldName;
 
-            if (String.isNotBlank(field.fieldValue)) {
+            if (String.isNotBlank(fieldWrapper.fieldValue)) {
+              // cast generic string value to proper primitive type
               switch on fieldType {
                 when BOOLEAN {
                   customField.value = (Object) Boolean.valueOf(
-                    field.fieldValue
+                    fieldWrapper.fieldValue
                   );
                 }
                 when DATE {
-                  customField.value = (Object) Date.valueOf(field.fieldValue);
+                  customField.value = (Object) Date.valueOf(fieldWrapper.fieldValue);
                 }
                 when DATETIME {
                   customField.value = (Object) Datetime.valueOf(
-                    field.fieldValue
+                    fieldWrapper.fieldValue
                   );
                 }
-                when DOUBLE {
-                  customField.value = (Object) Double.valueOf(field.fieldValue);
+                when DOUBLE, PERCENT {
+                  customField.value = (Object) Double.valueOf(fieldWrapper.fieldValue);
                 }
                 when INTEGER {
                   customField.value = (Object) Integer.valueOf(
-                    field.fieldValue
+                    fieldWrapper.fieldValue
                   );
                 }
                 when LONG {
-                  customField.value = (Object) Long.valueOf(field.fieldValue);
+                  customField.value = (Object) Long.valueOf(fieldWrapper.fieldValue);
                 }
-                when EMAIL, PICKLIST, REFERENCE, STRING, TEXTAREA, URL {
+                when EMAIL, PICKLIST, REFERENCE, STRING, TEXTAREA, URL, PHONE {
                   // string
-                  customField.value = field.fieldValue;
+                  customField.value = fieldWrapper.fieldValue;
                 }
               }
             } else {
               customField.value = null;
             }
 
-            customMetadata.values.add(customField);
+            customMetadataRecord.values.add(customField);
           }
         }
 
-        container.addMetadata(customMetadata);
+        container.addMetadata(customMetadataRecord);
       }
 
       deployJobId = Metadata.Operations.enqueueDeployment(

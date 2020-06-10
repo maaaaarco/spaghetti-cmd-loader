@@ -51,6 +51,19 @@ CSV columns must match the API name on your Custom Metadata Type fields. The CSV
 The specified string should use the standard date format “yyyy-MM-dd”.
 ## Datetime field
 The specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
+## Field types supported
+- Checkbox
+- Date
+- Datetime
+- Email
+- Number
+- Percent
+- Phone
+- Picklist
+- Text
+- Text Area
+- Text Area Long
+- URL
 
 # Credits
 - [Papa Parse](https://www.papaparse.com/) for its amazing Javascript CSV parser
