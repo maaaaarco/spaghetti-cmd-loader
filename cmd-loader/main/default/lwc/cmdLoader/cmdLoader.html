@@ -1,0 +1,87 @@
+<template>
+  <div class="slds-box slds-theme_default">
+    <div class="slds-grid slds-wrap">
+      <!-- form  -->
+      <div class="slds-col slds-size_1-of-1">
+        <div class="slds-grid slds-wrap">
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input
+              type="file"
+              label="Csv File"
+              accept=".csv"
+              onchange={handleFileChange}
+            ></lightning-input>
+          </div>
+
+          <div class="slds-col slds-size_1-of-2">
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="select-01"
+                >Custom Metadata Type</label
+              >
+              <div class="slds-form-element__control">
+                <div class="slds-select_container">
+                  <select
+                    class="slds-select"
+                    id="select-01"
+                    onchange={handleCmdTypeSelection}
+                  >
+                    <option value="">Please select</option>
+                    <template for:each={cmdTypes} for:item="cmdType">
+                      <option key={cmdType} value={cmdType}>{cmdType}</option>
+                    </template>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1">
+            <div class="slds-align_absolute-center">
+              <lightning-button
+                class="slds-p-around_x-small"
+                label="Load Records"
+                onclick={loadRecords}
+                disabled={disableLoad}
+              ></lightning-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- result -->
+      <div
+        if:true={deploymentId}
+        class="slds-col slds-size_1-of-1 slds-m-top_x-small"
+      >
+        <div class={resultThemeClass}>
+          <div class="slds-p-around_x-small slds-align_absolute-center">
+            <pre>
+              {deployResultMessage}
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- preview -->
+      <div
+        if:true={showPreview}
+        class="slds-col slds-size_1-of-1 slds-m-top_x-small"
+      >
+        <lightning-datatable
+          if:true={csvHasDeveloperName}
+          key-field="DeveloperName"
+          columns={columns}
+          data={cmdRecords}
+          hide-checkbox-column
+        ></lightning-datatable>
+
+        <div
+          if:false={csvHasDeveloperName}
+          class="slds-p-around_x-small slds-align_absolute-center"
+        >
+          CSV file must contain the DeveloperName column
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
