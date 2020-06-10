@@ -7,14 +7,15 @@
             "path": "cmd-loader",
             "default": true,
             "package": "Spaghetti CMD",
-            "versionName": "ver 0.2",
-            "versionNumber": "0.2.0.NEXT"
+            "versionName": "ver 0.3",
+            "versionNumber": "0.3.0.NEXT"
         }
     ],
     "packageAliases": {
         "Spaghetti CMD": "0Ho1t000000wk4FCAQ",
         "Spaghetti CMD@0.1.0-1": "04t1t000003nP5NAAU",
         "Spaghetti CMD@0.1.0-2": "04t1t000003nP5SAAU",
-        "Spaghetti CMD@0.2.0-1": "04t1t000003nP5cAAE"
+        "Spaghetti CMD@0.2.0-1": "04t1t000003nP5cAAE",
+        "Spaghetti CMD@0.3.0-1": "04t1t000003nP5hAAE"
     }
 }

@@ -8,11 +8,12 @@ Create or Update Custom Metadata Type records from CSV file
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
-## As Unlocked package
+## As Unlocked package (recommended)
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```
-sfdx force:package:install --package "04t1t000003nP5cAAE" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
+sfdx force:package:install --package "04t1t000003nP5hAAE" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
+This is the recommended approach since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
 
 ## Clone repository
 You can install this by cloning the repository and deploying the content of _cmd-loader_ folder. Before that you should remove the _namespace_ property in the _sfdx-project.json_ file.
