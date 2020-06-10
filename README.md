@@ -17,13 +17,13 @@ You can install this by cloning the repository and deploying the content of _cmd
 
 # User Guide
 
-1. Assign yourself, or ask your System Administrator to assign, the _Custom Metadata Loader_ permission set
+1. Assign yourself, or ask your System Administrator to assign, the _Custom Metadata Loader_ permission set to your user
 2. In the App Launcher search for _Custom Metadata Loader_ tab
-3. Select the CSV file (columns name must match API name)
+3. Select the CSV file
 4. Select the Custom Metadata Type
 5. Press Load Records
 
-# Demo
+## Demo
 [![Demo Video](https://img.youtube.com/vi/abYr7B-5vsA/0.jpg)](https://www.youtube.com/watch?v=abYr7B-5vsA)
 
 # Notes
