@@ -51,6 +51,7 @@ public with sharing class CMDLoaderController {
       SELECT QualifiedApiName
       FROM EntityDefinition
       WHERE IsCustomizable = true AND KeyPrefix LIKE 'm%'
+      ORDER BY QualifiedApiName ASC
     ]) {
       if (ed.QualifiedApiName.endsWithIgnoreCase(CMDConstants.MDT_SUFFIX)) {
         res.add(ed.QualifiedApiName);
