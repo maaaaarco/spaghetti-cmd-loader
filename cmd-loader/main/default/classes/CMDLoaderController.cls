@@ -9,6 +9,7 @@
  *  Controller class for cmdLoader LWC
  */
 public with sharing class CMDLoaderController {
+  
   public class RecordWrapper {
     @AuraEnabled
     public List<FieldWrapper> fields { get; set; }
@@ -49,9 +50,9 @@ public with sharing class CMDLoaderController {
     for (EntityDefinition ed : [
       SELECT QualifiedApiName
       FROM EntityDefinition
-      WHERE IsCustomizable = true
+      WHERE IsCustomizable = true AND KeyPrefix LIKE 'm%'
     ]) {
-      if (ed.QualifiedApiName.endsWithIgnoreCase(Constants.MDT_SUFFIX)) {
+      if (ed.QualifiedApiName.endsWithIgnoreCase(CMDConstants.MDT_SUFFIX)) {
         res.add(ed.QualifiedApiName);
       }
     }
@@ -109,7 +110,7 @@ public with sharing class CMDLoaderController {
     Id deployJobId = null;
 
     try {
-      String cmdTypeBaseName = cmdType.replace(Constants.MDT_SUFFIX, '');
+      String cmdTypeBaseName = cmdType.replace(CMDConstants.MDT_SUFFIX, '');
       Schema.DescribeSObjectResult objMetadata = Schema.describeSObjects(
         new List<String>{ cmdType }
       )[0];
@@ -120,10 +121,10 @@ public with sharing class CMDLoaderController {
         Metadata.CustomMetadata customMetadata = new Metadata.CustomMetadata();
 
         for (FieldWrapper field : wrapper.fields) {
-          if (field.fieldName == Constants.DEVELOPER_NAME_FIELD_NAME) {
+          if (field.fieldName == CMDConstants.DEVELOPER_NAME_FIELD_NAME) {
             customMetadata.fullName = cmdTypeBaseName + '.' + field.fieldValue;
           } else if (
-            Constants.MASTER_LABEL_FIELD_NAMES.contains(field.fieldName)
+            CMDConstants.MASTER_LABEL_FIELD_NAMES.contains(field.fieldName)
           ) {
             customMetadata.label = field.fieldValue;
           } else {
