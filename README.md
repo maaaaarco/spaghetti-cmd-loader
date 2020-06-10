@@ -17,7 +17,8 @@ This approach is recommended since all components will be deployed behind a name
 
 ## Installation URL (recommended)
 - [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
-- [Sandbox] (https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
+- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
+
 This approach is recommended since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
 
 ## Clone repository
