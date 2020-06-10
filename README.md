@@ -1,3 +1,5 @@
+![betaver](https://img.shields.io/badge/version-beta-yellow)
+
 # Custom Metadata Loader
 Create or Update Custom Metadata Type records from CSV file
 
