@@ -24,6 +24,7 @@ You can install this by cloning the repository and deploying the content of _cmd
 5. Press Load Records
 
 ## Demo
+YouTube video:
 [![Demo Video](https://img.youtube.com/vi/abYr7B-5vsA/0.jpg)](https://www.youtube.com/watch?v=abYr7B-5vsA)
 
 # Notes
