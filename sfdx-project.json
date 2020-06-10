@@ -1,10 +1,17 @@
 {
-  "packageDirectories": [
-    {
-      "path": "cmd-loader",
-      "default": true
+    "packageDirectories": [
+        {
+            "path": "cmd-loader",
+            "default": true,
+            "package": "Spaghetti CMD",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT"
+        }
+    ],
+    "namespace": "spaghettiCMD",
+    "sfdcLoginUrl": "https://spaghetti-dev-dev-ed.my.salesforce.com",
+    "sourceApiVersion": "48.0",
+    "packageAliases": {
+        "Spaghetti CMD": "0Ho1t000000wk4FCAQ"
     }
-  ],
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "48.0"
 }
