@@ -10,11 +10,13 @@ export default class CmdLoader extends LightningElement {
   @track cmdTypes = [];
   @track cmdRecords = [];
 
-  @track headers;
+  @track columns = [];
 
   @track selectedType;
 
   @track deployResult = {};
+
+  @track csvHasDeveloperName = false;
 
   papaParseLoaded = false;
   deploymentId;
@@ -25,17 +27,21 @@ export default class CmdLoader extends LightningElement {
   }
 
   get disableLoad() {
-    return !this.cmdRecords.length || !this.selectedType;
+    return (
+      !this.cmdRecords.length || !this.selectedType || !this.csvHasDeveloperName || this.deploymentId
+    );
   }
 
   get deployResultMessage() {
-    return this.deployResult.result;
+    return this.isDeployDone ? this.deployResult.result : "Deployment in progress";
   }
 
   get resultThemeClass() {
-    return this.deployResult.success
-      ? "slds-theme_success"
-      : "slds-theme_error";
+    return this.deployResult.done
+      ? this.deployResult.success
+        ? "slds-theme_success"
+        : "slds-theme_error"
+      : "slds-theme_info";
   }
 
   get isDeployDone() {
@@ -82,10 +88,25 @@ export default class CmdLoader extends LightningElement {
 
     fileReader.addEventListener("load", event => {
       const parseResult = Papa.parse(event.target.result, {
+        header: true,
         skipEmptyLines: true
       });
 
-      this.headers = parseResult.data.splice(0, 1)[0];
+      // creates headers for data-table
+      if (parseResult.data.length) {
+        const headers = Object.keys(parseResult.data[0]);
+
+        headers.forEach(header => {
+          this.columns.push({
+            label: header,
+            fieldName: header,
+            type: "text"
+          });
+
+          this.csvHasDeveloperName |= /^DeveloperName$/i.test(header);
+        });
+      }
+
       this.cmdRecords = parseResult.data;
     });
 
@@ -95,22 +116,20 @@ export default class CmdLoader extends LightningElement {
   loadRecords() {
     const recordWrappers = [];
 
-    for (let i = 0; i < this.cmdRecords.length; i++) {
-      let record = {
+    this.cmdRecords.forEach(cmdRecord => {
+      const recordWrapper = {
         fields: []
       };
 
-      let columns = this.cmdRecords[i];
-
-      for (let j = 0; j < columns.length; j++) {
-        record.fields.push({
-          fieldName: this.headers[j],
-          fieldValue: columns[j]
+      Object.keys(cmdRecord).forEach(field => {
+        recordWrapper.fields.push({
+          fieldName: field,
+          fieldValue: cmdRecord[field]
         });
-      }
+      });
 
-      recordWrappers.push(record);
-    }
+      recordWrappers.push(recordWrapper);
+    });
 
     upsertRecords({
       cmdType: this.selectedType,
@@ -121,14 +140,16 @@ export default class CmdLoader extends LightningElement {
         this._startCheckDeployPolling();
       })
       .catch(err => {
-        console.log(err);
+        this._dispatchError(err);
       });
   }
 
   _resetState() {
     this.deployResult = {};
     this.cmdRecords = [];
+    this.columns = [];
     this.deploymentId = undefined;
+    this.csvHasDeveloperName = false;
   }
 
   _startCheckDeployPolling() {
@@ -139,12 +160,13 @@ export default class CmdLoader extends LightningElement {
         })
           .then(response => {
             this.deployResult = response;
-            clearInterval(this.checkDeployIntervalId);
-            this.checkDeployIntervalId = null;
+            if (response.done) {
+              clearInterval(this.checkDeployIntervalId);
+              this.checkDeployIntervalId = null;
+            }
           })
           .catch(err => {
-            // this._dispatchError(err);
-            console.error(err);
+            this._dispatchError(err);
             clearInterval(this.checkDeployIntervalId);
             this.checkDeployIntervalId = null;
           });
@@ -156,7 +178,8 @@ export default class CmdLoader extends LightningElement {
     const toastEvent = new ShowToastEvent({
       title: "error",
       message: err.body.message,
-      variant: "error"
+      variant: "error",
+      mode: "sticky"
     });
     this.dispatchEvent(toastEvent);
   }

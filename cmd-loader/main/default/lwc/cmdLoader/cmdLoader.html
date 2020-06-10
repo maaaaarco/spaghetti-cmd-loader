@@ -50,7 +50,7 @@
 
       <!-- result -->
       <div
-        if:true={isDeployDone}
+        if:true={deploymentId}
         class="slds-col slds-size_1-of-1 slds-m-top_x-small"
       >
         <div class={resultThemeClass}>
@@ -67,27 +67,19 @@
         if:true={showPreview}
         class="slds-col slds-size_1-of-1 slds-m-top_x-small"
       >
-        <div class="slds-scrollable_x">
-          <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-            <thead>
-              <tr class="slds-line-height_reset">
-                <template for:each={headers} for:item="header">
-                  <th key={header} scope="col">
-                    <div class="slds-truncate">{header}</div>
-                  </th>
-                </template>
-              </tr>
-            </thead>
-            <tbody>
-              <template for:each={cmdRecords} for:item="row">
-                <tr key={row}>
-                  <template for:each={row} for:item="cell">
-                    <td key={cell}><div class="slds-truncate">{cell}</div></td>
-                  </template>
-                </tr>
-              </template>
-            </tbody>
-          </table>
+        <lightning-datatable
+          if:true={csvHasDeveloperName}
+          key-field="DeveloperName"
+          columns={columns}
+          data={cmdRecords}
+          hide-checkbox-column
+        ></lightning-datatable>
+
+        <div
+          if:false={csvHasDeveloperName}
+          class="slds-p-around_x-small slds-align_absolute-center"
+        >
+          CSV file must contain the DeveloperName column
         </div>
       </div>
     </div>
