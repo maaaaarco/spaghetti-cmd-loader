@@ -13,7 +13,12 @@ You can install this as an Unlocked Package, using the CLI, by running the follo
 ```
 sfdx force:package:install --package "04t1t000003nP5hAAE" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
-This is the recommended approach since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
+This approach is recommended since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
+
+## Installation URL (recommended)
+- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
+- [Sandbox] (https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
+This approach is recommended since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
 
 ## Clone repository
 You can install this by cloning the repository and deploying the content of _cmd-loader_ folder. Before that you should remove the _namespace_ property in the _sfdx-project.json_ file.
