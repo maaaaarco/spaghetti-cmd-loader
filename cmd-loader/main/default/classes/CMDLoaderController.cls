@@ -156,7 +156,7 @@ public with sharing class CMDLoaderController {
                     fieldWrapper.fieldValue
                   );
                 }
-                when DOUBLE {
+                when DOUBLE, PERCENT {
                   customField.value = (Object) Double.valueOf(fieldWrapper.fieldValue);
                 }
                 when INTEGER {
@@ -167,7 +167,7 @@ public with sharing class CMDLoaderController {
                 when LONG {
                   customField.value = (Object) Long.valueOf(fieldWrapper.fieldValue);
                 }
-                when EMAIL, PICKLIST, REFERENCE, STRING, TEXTAREA, URL {
+                when EMAIL, PICKLIST, REFERENCE, STRING, TEXTAREA, URL, PHONE {
                   // string
                   customField.value = fieldWrapper.fieldValue;
                 }
