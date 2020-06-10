@@ -5,7 +5,7 @@
  * If you would like to contribute https://github.com/maaaaarco/spaghetti-cmd-loader
  */
 @NamespaceAccessible
-public inherited sharing class Constants {
+public inherited sharing class CMDConstants {
   public static final String MDT_SUFFIX = '__mdt';
   public static final Set<String> MASTER_LABEL_FIELD_NAMES = new Set<String>{
     'MasterLabel',
