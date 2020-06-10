@@ -6,7 +6,7 @@ Create or Update Custom Metadata Type records from CSV file
 ## As Unlocked package
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```
-sfdx force:package:install --package "04t1t000003nP5NAAU" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
+sfdx force:package:install --package "04t1t000003nP5SAAU" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
 
 ## Clone repository
