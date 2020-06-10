@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020 Marco Zeuli
+ * Licensed under MIT license.
+ * For full license text, see LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ * If you would like to contribute https://github.com/maaaaarco/spaghetti-cmd-loader
+ */
+
 import { LightningElement, track } from "lwc";
 import retrieveCustomMetadataTypes from "@salesforce/apex/CMDLoaderController.retrieveCustomMetadataTypes";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
