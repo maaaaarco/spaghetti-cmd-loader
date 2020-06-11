@@ -56,8 +56,8 @@ You can install this by cloning the repository and deploying the content of _cmd
 - Phone
 - Picklist
 - Text
-- Text Area
-- Text Area Long
+- Text Area, supports multiline text
+- Text Area Long, supports multiline text
 - URL
 
 ## CSV columns <a href="user-guide-csv-cols"></a>
