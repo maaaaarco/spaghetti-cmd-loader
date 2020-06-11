@@ -12,6 +12,15 @@ import PapaParse from "@salesforce/resourceUrl/PapaParse";
 import { loadScript } from "lightning/platformResourceLoader";
 import upsertRecords from "@salesforce/apex/CMDLoaderController.upsertRecords";
 import checkDeployment from "@salesforce/apex/CMDLoaderController.checkDeployment";
+
+const MAX_PREVIEW_ROWS = 200;
+const DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON = {
+  body: {
+    message:
+      "Failed to schedule deploy. If your CSV file is very big (more than 500 rows) try to split it in smaller chunks and try again"
+  }
+};
+
 export default class CmdLoader extends LightningElement {
   @track cmdTypes = [];
   @track cmdRecords = [];
@@ -24,22 +33,38 @@ export default class CmdLoader extends LightningElement {
 
   @track csvHasDeveloperName = false;
 
+  @track showPreviewAnyway = false;
+
+  @track showLoadingSpinner = false;
+
   papaParseLoaded = false;
   deploymentId;
   checkDeployIntervalId;
 
   get showPreview() {
-    return this.cmdRecords.length;
+    return (
+      this.cmdRecords.length &&
+      (!this.tooManyRowsForPreview || this.showPreviewAnyway)
+    );
+  }
+
+  get tooManyRowsForPreview() {
+    return this.cmdRecords.length > MAX_PREVIEW_ROWS;
   }
 
   get disableLoad() {
     return (
-      !this.cmdRecords.length || !this.selectedType || !this.csvHasDeveloperName || this.deploymentId
+      !this.cmdRecords.length ||
+      !this.selectedType ||
+      !this.csvHasDeveloperName ||
+      this.deploymentId
     );
   }
 
   get deployResultMessage() {
-    return this.isDeployDone ? this.deployResult.result : "Deployment in progress";
+    return this.isDeployDone
+      ? this.deployResult.result
+      : "Deployment in progress";
   }
 
   get resultThemeClass() {
@@ -87,6 +112,11 @@ export default class CmdLoader extends LightningElement {
     if (event.target.files && event.target.files.length) {
       this._parseCsvAndDisplayPreview(event.target.files[0]);
     }
+  }
+
+  enableShowPreviewAnyway(event) {
+    event.preventDefault();
+    this.showPreviewAnyway = true;
   }
 
   _parseCsvAndDisplayPreview(file) {
@@ -137,16 +167,26 @@ export default class CmdLoader extends LightningElement {
       recordWrappers.push(recordWrapper);
     });
 
+    this.showLoadingSpinner = true;
+
     upsertRecords({
       cmdType: this.selectedType,
       records: recordWrappers
     })
       .then(data => {
-        this.deploymentId = data;
-        this._startCheckDeployPolling();
+        if (data) {
+          this.deploymentId = data;
+          this._startCheckDeployPolling();
+        } else {
+          // it's not clear why this happen since I'd expect the controller to catch it and throw an exception
+          // but it does sometime especially with large CSV file
+          this._dispatchError(DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON);
+        }
+        this.showLoadingSpinner = false;
       })
       .catch(err => {
         this._dispatchError(err);
+        this.showLoadingSpinner = false;
       });
   }
 
@@ -156,6 +196,8 @@ export default class CmdLoader extends LightningElement {
     this.columns = [];
     this.deploymentId = undefined;
     this.csvHasDeveloperName = false;
+    this.showPreviewAnyway = false;
+    this.showLoadingSpinner = false;
   }
 
   _startCheckDeployPolling() {
@@ -182,7 +224,6 @@ export default class CmdLoader extends LightningElement {
 
   _dispatchError(err) {
     const toastEvent = new ShowToastEvent({
-      title: "error",
       message: err.body.message,
       variant: "error",
       mode: "sticky"

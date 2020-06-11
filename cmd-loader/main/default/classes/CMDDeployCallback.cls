@@ -49,9 +49,20 @@ public inherited sharing class CMDDeployCallback implements Metadata.DeployCallb
   }
 
   private String parseDeploymentStatus() {
+    String numDeployed = this.result.numberComponentsDeployed != null
+      ? String.valueOf(this.result.numberComponentsDeployed)
+      : '0';
+    String numErrors = this.result.numberComponentErrors != null
+      ? String.valueOf(this.result.numberComponentErrors)
+      : '0';
     return String.format(
-      '[ {0} ] - Deployment done, status: {1}\n',
-      new List<String>{ this.result.id, this.result.status.name() }
+      '[{0}] - Deployment done, status: {1}\nComponents deployed: {2}\nErrors: {3}\n',
+      new List<String>{
+        this.result.id,
+        this.result.status.name(),
+        numDeployed,
+        numErrors
+      }
     );
   }
 
@@ -94,7 +105,7 @@ public inherited sharing class CMDDeployCallback implements Metadata.DeployCallb
       // are there any more ?
       if (this.result.details.componentFailures.size() > MAX_FAILURES) {
         res += String.format(
-          '...{0} more, check Setup -> Deployment Status page for additional details',
+          '...{0} more, go to "Setup -> Deployment Status" for additional details',
           new List<String>{
             String.valueOf(
               this.result.details.componentFailures.size() - MAX_FAILURES
