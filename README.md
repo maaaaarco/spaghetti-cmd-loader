@@ -47,14 +47,11 @@ YouTube video:
 CSV columns must match the API name on your Custom Metadata Type fields. The CSV file must include these columns: 
 - _DeveloperName_, is the unique identifier for the record 
 - One between _MasterLabel_ or _Label_, for the record's label
-## Date field
-The specified string should use the standard date format “yyyy-MM-dd”.
-## Datetime field
-The specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
+
 ## Field types supported
 - Checkbox
-- Date
-- Datetime
+- Date, the specified string should use the standard date format “yyyy-MM-dd”.
+- Datetime, the specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
 - Email
 - Number
 - Percent
