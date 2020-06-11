@@ -10,6 +10,7 @@ Create or Update Custom Metadata Type records from CSV file
 - [User guide](#user-guide)
   - [Supported field types](#user-guide-fields)
   - [CSV columns](#user-guide-csv-cols)
+  - [Limitations](#user-guide-limitations)
 - [Demo](#demo)
 - [Credits](#credits)
 
@@ -63,6 +64,12 @@ You can install this by cloning the repository and deploying the content of _cmd
 CSV columns must match the API name on your Custom Metadata Type fields. The CSV file must include these columns: 
 - _DeveloperName_, is the unique identifier for the record 
 - One between _MasterLabel_ or _Label_, for the record's label
+
+## Limitations <a href="user-guide-limitations"></a>
+The only limitation that I have encountered so far during testing is the CSV file size.
+Even though the theoretical limit would be around 6Mb (Apex heap size limit) the practical one is more like 140Kb. After multiple tests that seems to be a safe size that would not cause the application to hit any Governor Limit (like Apex CPU time, ecc...).
+
+If your file is bigger than 140Kb you can still try to load it. If it fails then split it in smaller chunks. In future I plan to automate this.
 
 # Demo <a href="demo"></a>
 YouTube video:
