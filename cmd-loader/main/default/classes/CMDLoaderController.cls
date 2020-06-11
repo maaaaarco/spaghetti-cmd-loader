@@ -157,7 +157,7 @@ public with sharing class CMDLoaderController {
               );
             }
 
-            Schema.DisplayType fieldType = objField.getDescribe().getType();
+            Schema.DisplayType fieldType = getFieldDisplayType(fieldWrapper.fieldName, objField);
 
             Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
             customField.field = fieldWrapper.fieldName;
@@ -241,5 +241,18 @@ public with sharing class CMDLoaderController {
     }
 
     return deployJobId;
+  }
+
+  private static Map<String, Schema.DisplayType> FIELD_TO_DISPLAY_TYPE_CACHE = new Map<String, Schema.DisplayType>();
+  private static Schema.DisplayType getFieldDisplayType(
+    String fieldName,
+    Schema.SObjectField objField
+  ) {
+    Schema.DisplayType res = FIELD_TO_DISPLAY_TYPE_CACHE.get(fieldName);
+    if (res == null) {
+      res = objField.getDescribe().getType();
+      FIELD_TO_DISPLAY_TYPE_CACHE.put(fieldName, res);
+    }
+    return res;
   }
 }
