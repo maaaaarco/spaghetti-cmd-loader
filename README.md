@@ -14,7 +14,6 @@ Create or Update Custom Metadata Type records from CSV file
 - [Credits](#credits)
 
 # Installation options <a href="installation"></a>
-
 <a href="https://githubsfdeploy.herokuapp.com/app/githubdeploy/maaaaarco/spaghetti-cmd-loader">
   <img alt="Deploy to Salesforce"
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
@@ -24,23 +23,22 @@ Create or Update Custom Metadata Type records from CSV file
 - [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
 - [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003nP5hAAE)
 
-This approach is recommended since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
+This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
 ## Unlocked package (recommended) <a href="installation-unlocked-pkg"></a>
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```bash
 sfdx force:package:install --package "04t1t000003nP5hAAE" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
-This approach is recommended since all components will be deployed behind a namespace, removing the chance of failures due to conflicting API names.
+This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
 ## Manual <a href="installation-clone-repo"></a>
 You can install this by cloning the repository and deploying the content of _cmd-loader_ folder. Before that you should remove the _namespace_ property in the _sfdx-project.json_ file.
-```
+```json
 "namespace": "spaghettiCMD"
 ```
 
 # User Guide <a href="user-guide"></a>
-
 1. Assign yourself, or ask your System Administrator to assign, the _Custom Metadata Loader_ permission set to your user
 1. In the App Launcher search for _Custom Metadata Loader_ tab
 1. Select the CSV file
