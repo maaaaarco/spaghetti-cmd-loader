@@ -14,32 +14,32 @@ Create or Update Custom Metadata Type records from CSV file
 - [Demo](#demo)
 - [Credits](#credits)
 
-# Installation options <a href="installation"></a>
+# Installation options <a id="installation"></a>
 <a href="https://githubsfdeploy.herokuapp.com/app/githubdeploy/maaaaarco/spaghetti-cmd-loader">
   <img alt="Deploy to Salesforce"
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
-## URL (recommended) <a href="installation-url"></a>
+## URL (recommended) <a id="installation-url"></a>
 - [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzNuAAI)
 - [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzNuAAI)
 
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
-## Unlocked package (recommended) <a href="installation-unlocked-pkg"></a>
+## Unlocked package (recommended) <a id="installation-unlocked-pkg"></a>
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```bash
 sfdx force:package:install --package "04t1t000002hzNuAAI" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
-## Manual <a href="installation-clone-repo"></a>
+## Manual <a id="installation-clone-repo"></a>
 You can install this by cloning the repository and deploying the content of _cmd-loader_ folder. Before that you should remove the _namespace_ property in the _sfdx-project.json_ file.
 ```json
 "namespace": "spaghettiCMD"
 ```
 
-# User Guide <a href="user-guide"></a>
+# User Guide <a id="user-guide"></a>
 After deploying the application follow these step to enable it for your users:
 
 1. Assign yourself, or ask your System Administrator to assign, the _Custom Metadata Loader_ permission set to your user
@@ -48,7 +48,7 @@ After deploying the application follow these step to enable it for your users:
 1. Select the Custom Metadata Type
 1. Click on _Load Records_ button
 
-## Field types supported <a href="user-guide-fields"></a>
+## Field types supported <a id="user-guide-fields"></a>
 - Checkbox
 - Date, the specified string should use the standard date format “yyyy-MM-dd”.
 - Datetime, the specified string should use the standard date format “yyyy-MM-dd HH:mm:ss” in the local time zone.
@@ -62,13 +62,13 @@ After deploying the application follow these step to enable it for your users:
 - Text Area Long, supports multiline text
 - URL
 
-## CSV columns <a href="user-guide-csv-cols"></a>
+## CSV columns <a id="user-guide-csv-cols"></a>
 CSV columns must match the API name on your Custom Metadata Type fields. The CSV file must include these columns: 
 - _DeveloperName_, is the unique identifier for the record 
 - One between _MasterLabel_ or _Label_, for the record's label
 
-## Limitations <a href="user-guide-limitations"></a>
-This application does not impose any hard limit on the CSV file size or number of rows but it is subjected to all [Apex Governor Limit](#https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_apexgov.htm).
+## Limitations <a id="user-guide-limitations"></a>
+This application does not impose any hard limit on the CSV file size or number of rows but it is subjected to all [Apex Governor Limit](https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_apexgov.htm).
 
 These are my suggestions:
 - CSV file size: 140Kb
@@ -77,10 +77,10 @@ These are my suggestions:
 If your file is bigger than 140Kb or has more than 500 rows you can still try to load it (nothing bad will happen!) but the application might not be able to schedule the deployment. If that's the case then you have to split it in smaller chunks.
 In future I plan to automate this.
 
-# Demo <a href="demo"></a>
+# Demo <a id="demo"></a>
 YouTube video:
 
 [![Demo Video](https://img.youtube.com/vi/abYr7B-5vsA/0.jpg)](https://www.youtube.com/watch?v=abYr7B-5vsA)
 
-# Credits <a href="credits"></a>
+# Credits <a id="credits"></a>
 - [Papa Parse](https://www.papaparse.com/) for its amazing Javascript CSV parser
