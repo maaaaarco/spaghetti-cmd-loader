@@ -44,11 +44,22 @@
           <div class="slds-col slds-size_1-of-1">
             <div class="slds-align_absolute-center">
               <lightning-button
+                if:false={showLoadingSpinner}
                 class="slds-p-around_x-small"
                 label="Load Records"
                 onclick={loadRecords}
                 disabled={disableLoad}
               ></lightning-button>
+              <div
+                if:true={showLoadingSpinner}
+                class="slds-p-around_small slds-is-relative"
+              >
+                <lightning-spinner
+                  variant="brand"
+                  size="small"
+                  alternative-text="Loading"
+                ></lightning-spinner>
+              </div>
             </div>
           </div>
         </div>
@@ -69,24 +80,37 @@
       </div>
 
       <!-- preview -->
-      <div
-        if:true={showPreview}
-        class="slds-col slds-size_1-of-1 slds-m-top_x-small"
-      >
-        <lightning-datatable
-          if:true={csvHasDeveloperName}
-          key-field="DeveloperName"
-          columns={columns}
-          data={cmdRecords}
-          hide-checkbox-column
-        ></lightning-datatable>
-
-        <div
-          if:false={csvHasDeveloperName}
-          class="slds-p-around_x-small slds-align_absolute-center"
-        >
-          CSV file must contain the DeveloperName column
-        </div>
+      <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
+        <template if:true={showPreview}>
+          <lightning-datatable
+            if:true={csvHasDeveloperName}
+            key-field="DeveloperName"
+            columns={columns}
+            data={cmdRecords}
+            hide-checkbox-column
+          ></lightning-datatable>
+          <div
+            if:false={csvHasDeveloperName}
+            class="slds-p-around_x-small slds-align_absolute-center"
+          >
+            CSV file must contain the DeveloperName column
+          </div>
+        </template>
+        <template if:false={showPreview}>
+          <div
+            if:true={tooManyRowsForPreview}
+            class="slds-p-around_x-small slds-align_absolute-center"
+          >
+            CSV file has too many rows, preview has been disabled because it
+            could significantly slow down your browser.
+            <a
+              href=""
+              onclick={enableShowPreviewAnyway}
+              class="slds-m-left_xx-small"
+              >Click here to display anyway</a
+            >
+          </div>
+        </template>
       </div>
     </div>
   </div>
