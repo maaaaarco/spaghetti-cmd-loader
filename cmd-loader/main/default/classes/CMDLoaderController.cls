@@ -9,7 +9,6 @@
  *  Controller class for cmdLoader LWC
  */
 public with sharing class CMDLoaderController {
-  
   public class RecordWrapper {
     @AuraEnabled
     public List<FieldWrapper> fields { get; set; }
@@ -93,7 +92,8 @@ public with sharing class CMDLoaderController {
       res.done = true;
       res.success = false;
       res.result =
-        'Unexpected exception occurred, message is: ' + unexpected.getMessage();
+        'Unexpected exception occurred while checking deployment status, message is: ' +
+        unexpected.getMessage();
     }
 
     return res;
@@ -111,32 +111,54 @@ public with sharing class CMDLoaderController {
     Id deployJobId = null;
 
     try {
-      Schema.DescribeSObjectResult objMetadata = Schema.describeSObjects(
+      // in case cmdType is not a valid object this will throw an exception
+      Schema.DescribeSObjectResult[] objMetadata = Schema.describeSObjects(
         new List<String>{ cmdType }
-      )[0];
-      
-      Map<String, Schema.SObjectField> fieldMap = objMetadata.fields.getMap();
-      
+      );
+
+      Map<String, Schema.SObjectField> fieldMap = objMetadata[0]
+        .fields.getMap();
+
       // component's name without __mdt suffix, used to set fullName attribute on records
-      final String cmdTypeBaseName = cmdType.replace(CMDConstants.MDT_SUFFIX, '');
+      final String cmdTypeBaseName = cmdType.replace(
+        CMDConstants.MDT_SUFFIX,
+        ''
+      );
 
       // deploy container
       Metadata.DeployContainer container = new Metadata.DeployContainer();
-      
+
       for (RecordWrapper recordWrapper : records) {
         Metadata.CustomMetadata customMetadataRecord = new Metadata.CustomMetadata();
 
         for (FieldWrapper fieldWrapper : recordWrapper.fields) {
-          if (fieldWrapper.fieldName == CMDConstants.DEVELOPER_NAME_FIELD_NAME) {
-            customMetadataRecord.fullName = cmdTypeBaseName + '.' + fieldWrapper.fieldValue;
+          if (
+            fieldWrapper.fieldName == CMDConstants.DEVELOPER_NAME_FIELD_NAME
+          ) {
+            customMetadataRecord.fullName =
+              cmdTypeBaseName +
+              '.' +
+              fieldWrapper.fieldValue;
           } else if (
-            CMDConstants.MASTER_LABEL_FIELD_NAMES.contains(fieldWrapper.fieldName)
+            CMDConstants.MASTER_LABEL_FIELD_NAMES.contains(
+              fieldWrapper.fieldName
+            )
           ) {
             customMetadataRecord.label = fieldWrapper.fieldValue;
           } else {
-            Schema.DisplayType fieldType = fieldMap.get(fieldWrapper.fieldName)
-              .getDescribe()
-              .getType();
+            Schema.SObjectField objField = fieldMap.get(fieldWrapper.fieldName);
+
+            if (objField == null) {
+              throw new AuraHandledException(
+                String.format(
+                  'Field {0} does not exist on {1}. CSV columns must match field API name.',
+                  new List<String>{ fieldWrapper.fieldName, cmdType }
+                )
+              );
+            }
+
+            Schema.DisplayType fieldType = objField.getDescribe().getType();
+
             Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
             customField.field = fieldWrapper.fieldName;
 
@@ -149,7 +171,9 @@ public with sharing class CMDLoaderController {
                   );
                 }
                 when DATE {
-                  customField.value = (Object) Date.valueOf(fieldWrapper.fieldValue);
+                  customField.value = (Object) Date.valueOf(
+                    fieldWrapper.fieldValue
+                  );
                 }
                 when DATETIME {
                   customField.value = (Object) Datetime.valueOf(
@@ -157,7 +181,9 @@ public with sharing class CMDLoaderController {
                   );
                 }
                 when DOUBLE, PERCENT {
-                  customField.value = (Object) Double.valueOf(fieldWrapper.fieldValue);
+                  customField.value = (Object) Double.valueOf(
+                    fieldWrapper.fieldValue
+                  );
                 }
                 when INTEGER {
                   customField.value = (Object) Integer.valueOf(
@@ -165,10 +191,16 @@ public with sharing class CMDLoaderController {
                   );
                 }
                 when LONG {
-                  customField.value = (Object) Long.valueOf(fieldWrapper.fieldValue);
+                  customField.value = (Object) Long.valueOf(
+                    fieldWrapper.fieldValue
+                  );
                 }
                 when EMAIL, PICKLIST, REFERENCE, STRING, TEXTAREA, URL, PHONE {
                   // string
+                  customField.value = fieldWrapper.fieldValue;
+                }
+                when else {
+                  // tries with string
                   customField.value = fieldWrapper.fieldValue;
                 }
               }
@@ -187,9 +219,24 @@ public with sharing class CMDLoaderController {
         container,
         new CMDDeployCallback()
       );
+
+      if (String.isBlank(deployJobId)) {
+        // it is not 100% clear why this happen, usually with large CSV file
+        throw new AuraHandledException(
+          'Failed to schedule deploy. If your CSV file is very big (more than 500 rows) try to split it in smaller chunks and try again'
+        );
+      }
+    } catch (AuraHandledException reThrow) {
+      throw reThrow;
     } catch (Exception unexpected) {
       throw new AuraHandledException(
-        'Unexpected exception occurred, message is: ' + unexpected.getMessage()
+        String.format(
+          'Unexpected exception occurred, message is: {0}\nStackTrace: {1}',
+          new List<String>{
+            unexpected.getMessage(),
+            unexpected.getStackTraceString()
+          }
+        )
       );
     }
 
