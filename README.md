@@ -40,6 +40,8 @@ You can install this by cloning the repository and deploying the content of _cmd
 ```
 
 # User Guide <a href="user-guide"></a>
+After deploying the application follow these step to enable it for your users:
+
 1. Assign yourself, or ask your System Administrator to assign, the _Custom Metadata Loader_ permission set to your user
 1. In the App Launcher search for _Custom Metadata Loader_ tab
 1. Select the CSV file
