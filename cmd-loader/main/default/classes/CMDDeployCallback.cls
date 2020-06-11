@@ -105,7 +105,7 @@ public inherited sharing class CMDDeployCallback implements Metadata.DeployCallb
       // are there any more ?
       if (this.result.details.componentFailures.size() > MAX_FAILURES) {
         res += String.format(
-          '...{0} more, check Setup -> Deployment Status page for additional details',
+          '...{0} more, go to "Setup -> Deployment Status" for additional details',
           new List<String>{
             String.valueOf(
               this.result.details.componentFailures.size() - MAX_FAILURES
