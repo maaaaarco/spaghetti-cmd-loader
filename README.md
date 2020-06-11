@@ -68,10 +68,14 @@ CSV columns must match the API name on your Custom Metadata Type fields. The CSV
 - One between _MasterLabel_ or _Label_, for the record's label
 
 ## Limitations <a href="user-guide-limitations"></a>
-The only limitation that I have encountered so far during testing is the CSV file size.
-Even though the theoretical limit would be around 6Mb (Apex heap size limit) the practical one is more like 140Kb. After multiple tests that seems to be a safe size that would not cause the application to hit any Governor Limit (like Apex CPU time, ecc...).
+This application does not impose any hard limit on the CSV file size or number of rows but it is subjected to all [Apex Governor Limit](#https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_apexgov.htm).
 
-If your file is bigger than 140Kb you can still try to load it. If it fails then split it in smaller chunks. In future I plan to automate this.
+These are my suggestions:
+- CSV file size: 140Kb
+- Number of Rows: between 500 and 800
+
+If your file is bigger than 140Kb or has more than 500 rows you can still try to load it (nothing bad will happen!) but the application might not be able to schedule the deployment. If that's the case then you have to split it in smaller chunks.
+In future I plan to automate this.
 
 # Demo <a href="demo"></a>
 YouTube video:
