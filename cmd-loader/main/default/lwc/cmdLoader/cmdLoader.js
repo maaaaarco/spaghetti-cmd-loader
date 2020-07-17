@@ -13,7 +13,7 @@ import { loadScript } from "lightning/platformResourceLoader";
 import upsertRecords from "@salesforce/apex/CMDLoaderController.upsertRecords";
 import checkDeployment from "@salesforce/apex/CMDLoaderController.checkDeployment";
 
-const MAX_PREVIEW_ROWS = 200;
+const MAX_PREVIEW_ROWS = 250;
 const DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON = {
   body: {
     message:
