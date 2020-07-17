@@ -29,13 +29,13 @@ export default class CmdLoader extends LightningElement {
 
   @track selectedType;
 
-  @track deployResult = {};
+  @track deployResults = [];
 
   @track csvHasDeveloperName = false;
 
   @track showPreviewAnyway = false;
 
-  @track showLoadingSpinner = false;
+  @track deployCounter = 0;
 
   papaParseLoaded = false;
   deploymentId;
@@ -61,22 +61,8 @@ export default class CmdLoader extends LightningElement {
     );
   }
 
-  get deployResultMessage() {
-    return this.isDeployDone
-      ? this.deployResult.result
-      : "Deployment in progress";
-  }
-
-  get resultThemeClass() {
-    return this.deployResult.done
-      ? this.deployResult.success
-        ? "slds-theme_success"
-        : "slds-theme_error"
-      : "slds-theme_info";
-  }
-
-  get isDeployDone() {
-    return this.deployResult.done;
+  get numberOfDeploys() {
+    return Math.ceil(this.cmdRecords.length / MAX_PREVIEW_ROWS);
   }
 
   renderedCallback() {
@@ -113,6 +99,7 @@ export default class CmdLoader extends LightningElement {
       this._parseCsvAndDisplayPreview(event.target.files[0]);
     }
   }
+
 
   enableShowPreviewAnyway(event) {
     event.preventDefault();
@@ -152,7 +139,18 @@ export default class CmdLoader extends LightningElement {
   loadRecords() {
     const recordWrappers = [];
 
-    this.cmdRecords.forEach(cmdRecord => {
+    const startIdx = this.deployCounter * MAX_PREVIEW_ROWS;
+
+    if (startIdx > this.cmdRecords.length) {
+      return; // deployment complete
+    }
+
+    const cmdRecordsToDeploy = this.cmdRecords.slice(
+      startIdx,
+      startIdx + MAX_PREVIEW_ROWS
+    );
+
+    cmdRecordsToDeploy.forEach(cmdRecord => {
       const recordWrapper = {
         fields: []
       };
@@ -167,8 +165,6 @@ export default class CmdLoader extends LightningElement {
       recordWrappers.push(recordWrapper);
     });
 
-    this.showLoadingSpinner = true;
-
     upsertRecords({
       cmdType: this.selectedType,
       records: recordWrappers
@@ -176,28 +172,28 @@ export default class CmdLoader extends LightningElement {
       .then(data => {
         if (data) {
           this.deploymentId = data;
+          this.deployCounter++;
           this._startCheckDeployPolling();
         } else {
           // it's not clear why this happen since I'd expect the controller to catch it and throw an exception
           // but it does sometime especially with large CSV file
           this._dispatchError(DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON);
+          this._clearIntervals();
         }
-        this.showLoadingSpinner = false;
       })
       .catch(err => {
         this._dispatchError(err);
-        this.showLoadingSpinner = false;
       });
   }
 
   _resetState() {
-    this.deployResult = {};
+    this.deployResults = [];
     this.cmdRecords = [];
     this.columns = [];
     this.deploymentId = undefined;
     this.csvHasDeveloperName = false;
     this.showPreviewAnyway = false;
-    this.showLoadingSpinner = false;
+    this.deployCounter = 0;
   }
 
   _startCheckDeployPolling() {
@@ -207,18 +203,30 @@ export default class CmdLoader extends LightningElement {
           deployId: this.deploymentId
         })
           .then(response => {
-            this.deployResult = response;
+            response.count = this.deployCounter;
+            if (this.deployResults.length != this.deployCounter) {
+              this.deployResults.push(response);
+            } else {
+              this.deployResults[this.deployResults.length - 1] = response;
+            }
             if (response.done) {
-              clearInterval(this.checkDeployIntervalId);
-              this.checkDeployIntervalId = null;
+              // invokes loadRecords in case there are still records to process
+              this.loadRecords();
+              this._clearIntervals();
             }
           })
           .catch(err => {
             this._dispatchError(err);
-            clearInterval(this.checkDeployIntervalId);
-            this.checkDeployIntervalId = null;
+            this._clearIntervals();
           });
       }, 2000);
+    }
+  }
+
+  _clearIntervals() {
+    if (this.checkDeployIntervalId) {
+      clearInterval(this.checkDeployIntervalId);
+      this.checkDeployIntervalId = null;
     }
   }
 

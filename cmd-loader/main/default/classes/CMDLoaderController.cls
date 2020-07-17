@@ -32,10 +32,15 @@ public with sharing class CMDLoaderController {
     public Boolean success { get; set; }
     @AuraEnabled
     public String result { get; set; }
+    @AuraEnabled
+    public String id { get; set; }
+    @AuraEnabled
+    public Integer count { get; set; }
 
-    public DeploymentStatusWrapper() {
+    public DeploymentStatusWrapper(String id) {
       done = false;
       success = false;
+      this.id = id;
     }
   }
 
@@ -70,7 +75,7 @@ public with sharing class CMDLoaderController {
    */
   @AuraEnabled
   public static DeploymentStatusWrapper checkDeployment(String deployId) {
-    DeploymentStatusWrapper res = new DeploymentStatusWrapper();
+    DeploymentStatusWrapper res = new DeploymentStatusWrapper(deployId);
 
     try {
       for (FeedItem feed : [
@@ -157,7 +162,10 @@ public with sharing class CMDLoaderController {
               );
             }
 
-            Schema.DisplayType fieldType = getFieldDisplayType(fieldWrapper.fieldName, objField);
+            Schema.DisplayType fieldType = getFieldDisplayType(
+              fieldWrapper.fieldName,
+              objField
+            );
 
             Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
             customField.field = fieldWrapper.fieldName;
