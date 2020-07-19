@@ -144,12 +144,18 @@
       >
         <template if:true={showPreview}>
           <lightning-datatable
-            if:true={csvHasDeveloperName}
+            if:false={tooManyRowsForPreview}
             key-field="DeveloperName"
             columns={columns}
             data={cmdRecords}
+            column-widths-mode="auto"
             hide-checkbox-column
           ></lightning-datatable>
+          <c-cmd-datatable
+            if:true={tooManyRowsForPreview}
+            columns={columns}
+            records={cmdRecords}
+          ></c-cmd-datatable>
         </template>
         <template if:false={showPreview}>
           <div
@@ -158,7 +164,7 @@
           >
             <span>
               CSV file has too many rows, preview has been disabled because it
-              could significantly slow down your browser.
+              could slow down your browser.
               <a
                 href=""
                 onclick={enableShowPreviewAnyway}

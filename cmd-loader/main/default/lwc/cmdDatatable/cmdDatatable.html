@@ -1,0 +1,28 @@
+<template>
+  <div class="slds-scrollable_x">
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+      <thead>
+        <template for:each={headers} for:item="header">
+          <th key={header} class="" scope="col">
+            <div class="slds-truncate">
+              {header}
+            </div>
+          </th>
+        </template>
+      </thead>
+      <tbody>
+        <template for:each={rows} for:item="row">
+          <tr key={row.id}>
+            <template for:each={row.cells} for:item="cell">
+              <td key={cell}>
+                <div class="slds-truncate">
+                  {cell}
+                </div>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</template>
