@@ -31,12 +31,12 @@ jobs:
     
     - name: Install new version in Dev Hub
       run: |
-        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail 1)
+        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
         sfdx force:package:install -p "$new_version_id" -u devhub --wait 10 --publishwait 10
     
     - name: Store new version id
       run: |
-        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail 1)
+        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
         sed -i -e "s/04t[[:alnum:]]\{15\}/${new_version_id}/" README.md
         git config user.name "release[bot]"
         git config user.email "<>"

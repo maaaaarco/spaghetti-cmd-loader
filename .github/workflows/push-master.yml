@@ -32,7 +32,7 @@ jobs:
 
     - name: Promote latest version
       run: |
-        version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail 1)
+        version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
         sfdx force:package:version:promote -p "$version_id"
     
     - name: Tag new release
