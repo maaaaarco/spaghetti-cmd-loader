@@ -1,0 +1,37 @@
+name: PR Validate
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  validate_pr:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Salesforce CLI
+      run: |
+        wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+        mkdir sfdx-cli
+        tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+        ./sfdx-cli/install
+    
+    - name: Populate auth file
+      shell: bash
+      run: 'echo ${{secrets.DEVHUB_SFDX_URL}} > ./DEVHUB_SFDX_URL.txt'
+    
+    - name: Authenticate Dev Hub
+      run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
+
+    - name: Create scratch org
+      run: 'sfdx force:org:create -f config/project-scratch-def.json -a ci_scratch -s -d 1'
+    
+    - name: Push source to scratch org
+      run: 'sfdx force:source:push'
+    
+    - name: Delete scratch org
+      if: always()
+      run: 'sfdx force:org:delete -p -u scratch-org'
