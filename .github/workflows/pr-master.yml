@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  validate_pr:
+  pre_release:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -37,7 +37,9 @@ jobs:
       run: |
         new_version_id=$(jq '.result.SubscriberPackageVersionId' version.json | tr -d '"')
         sed -i -e "s/04t[[:alnum:]]\{15\}/${new_version_id}/" README.md
-        git config --global user.name "github-actions[bot]"
+        git config user.name "github-actions[bot]"
+        git config user.email "<>"
         git add README.md
-        git commit -m "Updating README.md with new version"
-        git push
+        git add sfdx-project.json
+        git commit -m "Storing new pre-release version"
+        git push origin develop
