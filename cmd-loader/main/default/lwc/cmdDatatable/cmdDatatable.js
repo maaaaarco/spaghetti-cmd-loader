@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2020 Marco Zeuli
+ * Licensed under MIT license.
+ * For full license text, see LICENSE file in the repo root or https://opensource.org/licenses/MIT
+ * If you would like to contribute https://github.com/maaaaarco/spaghetti-cmd-loader
+ */
+
+ /**
+  * Custom datatable component, used to display big CSV files
+  */
 import { LightningElement, api } from "lwc";
 
 export default class CmdDatatable extends LightningElement {
