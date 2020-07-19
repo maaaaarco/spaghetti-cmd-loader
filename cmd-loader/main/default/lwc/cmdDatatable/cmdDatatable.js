@@ -1,5 +1,4 @@
 import { LightningElement, api } from "lwc";
-import Header from "@salesforce/schema/PromptVersion.Header";
 
 export default class CmdDatatable extends LightningElement {
   @api columns;
