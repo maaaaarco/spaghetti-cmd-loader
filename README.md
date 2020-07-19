@@ -70,12 +70,9 @@ CSV columns must match the API name on your Custom Metadata Type fields. The CSV
 ## Limitations <a id="user-guide-limitations"></a>
 This application does not impose any hard limit on the CSV file size or number of rows but it is subjected to all [Apex Governor Limit](https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_apexgov.htm).
 
-These are my suggestions:
-- CSV file size: 140Kb
-- Number of Rows: between 500 and 800
+If your CSV file contains many rows (more than 250) the application will automatically split it into smaller chunks of 250 rows each. Each chunk will be loaded independently.
 
-If your file is bigger than 140Kb or has more than 500 rows you can still try to load it (nothing bad will happen!) but the application might not be able to schedule the deployment. If that's the case then you have to split it in smaller chunks.
-In future I plan to automate this.
+In June 11, 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released a bunch of new commands to work with Custom Metadata Types. Among these there's one that allows  records creation from a CSV file. You can read more about those commands [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/README.md#48181-june-11-2020).
 
 # Demo <a id="demo"></a>
 YouTube video:
