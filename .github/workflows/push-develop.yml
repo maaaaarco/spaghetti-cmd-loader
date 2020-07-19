@@ -1,0 +1,46 @@
+name: Create pre-release version
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  pre_release:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Salesforce CLI
+      run: |
+        wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+        mkdir sfdx-cli
+        tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+        ./sfdx-cli/install
+    
+    - name: Populate auth file
+      shell: bash
+      run: 'echo ${{secrets.DEVHUB_SFDX_URL}} > ./DEVHUB_SFDX_URL.txt'
+    
+    - name: Authenticate Dev Hub
+      run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
+
+    - name: Create new version
+      run: 'sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60'
+    
+    - name: Install new version in Dev Hub
+      run: |
+        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail 1)
+        sfdx force:package:install -p "$new_version_id" -u devhub --wait 10 --publishwait 10
+    
+    - name: Store new version id
+      run: |
+        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail 1)
+        sed -i -e "s/04t[[:alnum:]]\{15\}/${new_version_id}/" README.md
+        git config user.name "release[bot]"
+        git config user.email "<>"
+        git add README.md
+        git add sfdx-project.json
+        git commit -m "Updating new pre-release version"
+        git push
