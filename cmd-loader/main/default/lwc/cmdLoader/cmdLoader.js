@@ -32,18 +32,32 @@ export default class CmdLoader extends LightningElement {
   @track deployResults = [];
 
   @track csvHasDeveloperName = false;
+  @track csvHasMasterLabel = false;
 
   @track showPreviewAnyway = false;
 
   @track deployCounter = 0;
 
+  @track validationInProgress = false;
+  @track warningMessages = [];
+
   papaParseLoaded = false;
   deploymentId;
   checkDeployIntervalId;
 
+  masterLabelColumn;
+  developerNameColumn;
+
+  get hasAllRequiredColumns() {
+    return (
+      !this.fileParsed ||
+      (this.csvHasDeveloperName && this.csvHasMasterLabel)
+    );
+  }
+
   get showPreview() {
     return (
-      this.cmdRecords.length &&
+      this.fileParsed &&
       (!this.tooManyRowsForPreview || this.showPreviewAnyway)
     );
   }
@@ -54,15 +68,23 @@ export default class CmdLoader extends LightningElement {
 
   get disableLoad() {
     return (
-      !this.cmdRecords.length ||
+      !this.fileParsed ||
       !this.selectedType ||
-      !this.csvHasDeveloperName ||
+      !this.hasAllRequiredColumns ||
       this.deploymentId
     );
   }
 
   get numberOfDeploys() {
     return Math.ceil(this.cmdRecords.length / MAX_PREVIEW_ROWS);
+  }
+
+  get hasWarningMessages() {
+    return this.fileParsed && this.warningMessages.length;
+  }
+
+  get fileParsed() {
+    return !!this.cmdRecords.length;
   }
 
   renderedCallback() {
@@ -100,40 +122,9 @@ export default class CmdLoader extends LightningElement {
     }
   }
 
-
   enableShowPreviewAnyway(event) {
     event.preventDefault();
     this.showPreviewAnyway = true;
-  }
-
-  _parseCsvAndDisplayPreview(file) {
-    const fileReader = new FileReader();
-
-    fileReader.addEventListener("load", event => {
-      const parseResult = Papa.parse(event.target.result, {
-        header: true,
-        skipEmptyLines: true
-      });
-
-      // creates headers for data-table
-      if (parseResult.data.length) {
-        const headers = Object.keys(parseResult.data[0]);
-
-        headers.forEach(header => {
-          this.columns.push({
-            label: header,
-            fieldName: header,
-            type: "text"
-          });
-
-          this.csvHasDeveloperName |= /^DeveloperName$/i.test(header);
-        });
-      }
-
-      this.cmdRecords = parseResult.data;
-    });
-
-    fileReader.readAsText(file);
   }
 
   loadRecords() {
@@ -186,14 +177,98 @@ export default class CmdLoader extends LightningElement {
       });
   }
 
+  _parseCsvAndDisplayPreview(file) {
+    const fileReader = new FileReader();
+
+    fileReader.addEventListener("load", event => {
+      const parseResult = Papa.parse(event.target.result, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      // creates headers for data-table
+      if (parseResult.data.length) {
+        const headers = Object.keys(parseResult.data[0]);
+
+        headers.forEach(header => {
+          this.columns.push({
+            label: header,
+            fieldName: header,
+            type: "text"
+          });
+
+          if (/^DeveloperName$/i.test(header)) {
+            this.csvHasDeveloperName = true;
+            this.developerNameColumn = header;
+          }
+
+          if (/^(Master)?Label$/i.test(header)) {
+            this.csvHasMasterLabel = true;
+            this.masterLabelColumn = header;
+          }
+        });
+      }
+
+      this.cmdRecords = parseResult.data;
+      this._startRecordValidation();
+    });
+
+    fileReader.readAsText(file);
+  }
+
+  _startRecordValidation() {
+    if (this.hasAllRequiredColumns) {
+      this.validationInProgress = true;
+      setTimeout(() => {
+        this._validateRecords();  
+      }, 2000);
+    }
+  }
+
+  _validateRecords() {
+    const warnings = [];
+
+    // stores a count for each developer name
+    const devNameCount = {};
+
+    this.cmdRecords.forEach((record, idx) => {
+      const devName = record[this.developerNameColumn];
+      const label = record[this.masterLabelColumn];
+
+      if (!devName) {
+        warnings.push(
+          `Row ${idx + 1} - Developer Name cannot be blank`
+        );
+      } else {
+        if (devNameCount[devName]) {
+          warnings.push(
+            `Row ${idx +
+              1} - Developer Name ${devName} occurs more than one time`
+          );
+        }
+        devNameCount[devName] = 1;
+      }
+
+      if (!label) {
+        warnings.push(`Row ${idx + 1} - Label cannot be blank`);
+      }
+    });
+
+    this.warningMessages = warnings;
+    this.validationInProgress = false;
+  }
+
   _resetState() {
     this.deployResults = [];
     this.cmdRecords = [];
     this.columns = [];
     this.deploymentId = undefined;
     this.csvHasDeveloperName = false;
+    this.csvHasMasterLabel = false;
     this.showPreviewAnyway = false;
     this.deployCounter = 0;
+    this.warningMessages = [];
+    this.validationInProgress = false;
   }
 
   _startCheckDeployPolling() {
