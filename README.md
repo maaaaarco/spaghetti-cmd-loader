@@ -72,7 +72,7 @@ This application does not impose any hard limit on the CSV file size or number o
 
 If your CSV file contains many rows (more than 250) the application will automatically split it into smaller chunks of 250 rows each. Each chunk will be loaded independently.
 
-In June 11, 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released a bunch of new commands to work with Custom Metadata Types. Among these there's one that allows  records creation from a CSV file. You can read more about those commands [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/README.md#48181-june-11-2020).
+In June 11, 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released a bunch of new commands to work with Custom Metadata Types. Among these there's one that allows records creation from a CSV file. Check them out [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/v48.md#48181-june-11-2020).
 
 # Demo <a id="demo"></a>
 YouTube video:
