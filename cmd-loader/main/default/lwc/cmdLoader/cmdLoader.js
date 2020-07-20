@@ -132,7 +132,7 @@ export default class CmdLoader extends LightningElement {
 
     const startIdx = this.deployCounter * MAX_PREVIEW_ROWS;
 
-    if (startIdx > this.cmdRecords.length) {
+    if (startIdx >= this.cmdRecords.length) {
       return; // deployment complete
     }
 

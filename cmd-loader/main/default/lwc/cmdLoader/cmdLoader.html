@@ -54,47 +54,6 @@
         </div>
       </div>
 
-      <!-- warning messages -->
-      <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
-        <div
-          if:true={validationInProgress}
-          class="slds-p-around_small slds-is-relative"
-        >
-          <lightning-spinner
-            size="small"
-            alternative-text="Record validation in progress..."
-          >
-          </lightning-spinner>
-          <div class="slds-align_absolute-center">
-            Records validation in progress...
-          </div>
-        </div>
-        <div if:true={hasWarningMessages} class="slds-theme_warning">
-          <div class="slds-align_absolute-center">
-            <span
-              class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small"
-            >
-              <lightning-icon
-                icon-name="utility:warning"
-                size="x-small"
-                variant="inverse"
-              ></lightning-icon>
-            </span>
-            <h2>
-              Something seems wrong with your CSV file, please have a look at
-              these:
-            </h2>
-          </div>
-          <div class="slds-m-top_x-small slds-align_absolute-center">
-            <ul class="slds-list_dotted">
-              <template for:each={warningMessages} for:item="msg">
-                <li key={msg}>{msg}</li>
-              </template>
-            </ul>
-          </div>
-        </div>
-      </div>
-
       <!-- result -->
       <div
         if:true={deploymentId}
@@ -137,6 +96,47 @@
         </table>
       </div>
 
+      <!-- warning messages -->
+      <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
+        <div
+          if:true={validationInProgress}
+          class="slds-p-around_small slds-is-relative"
+        >
+          <lightning-spinner
+            size="small"
+            alternative-text="Record validation in progress..."
+          >
+          </lightning-spinner>
+          <div class="slds-align_absolute-center">
+            Records validation in progress...
+          </div>
+        </div>
+        <div if:true={hasWarningMessages} class="slds-theme_warning">
+          <div class="slds-align_absolute-center">
+            <span
+              class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small"
+            >
+              <lightning-icon
+                icon-name="utility:warning"
+                size="x-small"
+                variant="inverse"
+              ></lightning-icon>
+            </span>
+            <h2>
+              Something seems wrong with your CSV file, please have a look at
+              these:
+            </h2>
+          </div>
+          <div class="slds-m-top_x-small slds-align_absolute-center">
+            <ul class="slds-list_dotted">
+              <template for:each={warningMessages} for:item="msg">
+                <li key={msg}>{msg}</li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <!-- preview -->
       <div
         if:true={hasAllRequiredColumns}
@@ -144,12 +144,18 @@
       >
         <template if:true={showPreview}>
           <lightning-datatable
-            if:true={csvHasDeveloperName}
+            if:false={tooManyRowsForPreview}
             key-field="DeveloperName"
             columns={columns}
             data={cmdRecords}
+            column-widths-mode="auto"
             hide-checkbox-column
           ></lightning-datatable>
+          <c-cmd-datatable
+            if:true={tooManyRowsForPreview}
+            columns={columns}
+            records={cmdRecords}
+          ></c-cmd-datatable>
         </template>
         <template if:false={showPreview}>
           <div
@@ -158,7 +164,7 @@
           >
             <span>
               CSV file has too many rows, preview has been disabled because it
-              could significantly slow down your browser.
+              could slow down your browser.
               <a
                 href=""
                 onclick={enableShowPreviewAnyway}
@@ -173,6 +179,7 @@
         </template>
       </div>
 
+      <!-- error messages -->
       <div
         if:false={hasAllRequiredColumns}
         class="slds-col slds-size_1-of-1 slds-m-top_x-small"
