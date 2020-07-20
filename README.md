@@ -21,15 +21,15 @@ Create or Update Custom Metadata Type records from CSV file
 </a>
 
 ## URL (recommended) <a id="installation-url"></a>
-- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzNuAAI)
-- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzNuAAI)
+- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzYUAAY)
+- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hzYUAAY)
 
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
 ## Unlocked package (recommended) <a id="installation-unlocked-pkg"></a>
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```bash
-sfdx force:package:install --package "04t1t000002hzNuAAI" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
+sfdx force:package:install --package "04t1t000002hzYUAAY" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
@@ -72,7 +72,7 @@ This application does not impose any hard limit on the CSV file size or number o
 
 If your CSV file contains more than 250 rows the application will automatically split it into smaller chunks of 250 rows each. Chunks will be loaded sequentially.
 
-Since June 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released new commands to work with Custom Metadata Types. Among these there's one that allows records creation from a CSV file. You can read more about those commands [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/README.md#48181-june-11-2020).
+In June 11, 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released a bunch of new commands to work with Custom Metadata Types. Among these there's one that allows records creation from a CSV file. Check them out [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/v48.md#48181-june-11-2020).
 
 # Demo <a id="demo"></a>
 YouTube video:
