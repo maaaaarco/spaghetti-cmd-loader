@@ -145,11 +145,13 @@
         <template if:true={showPreview}>
           <lightning-datatable
             if:false={tooManyRowsForPreview}
-            key-field="DeveloperName"
+            key-field="key"
             columns={columns}
             data={cmdRecords}
             column-widths-mode="auto"
             hide-checkbox-column
+            suppress-bottom-bar	
+            oncellchange={handleCellChange}
           ></lightning-datatable>
           <c-cmd-datatable
             if:true={tooManyRowsForPreview}
