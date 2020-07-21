@@ -37,7 +37,7 @@ jobs:
     
     - name: Tag new release
       run: |
-        tag_name=$(jq ".packageDirectories[0].versionName" sfdx-project.json | tr -d '"')
+        tag_name=$(jq ".packageDirectories[0].versionName" sfdx-project.json | tr -d '"'| tr -d ' ')
         pkg_name=$(jq ".packageDirectories[0].package" sfdx-project.json | tr -d '"')
         git tag -a "$tag_name" -m "$pkg_name $tag_name"
         git push origin "$tag_name"
