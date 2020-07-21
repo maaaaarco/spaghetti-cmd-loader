@@ -1,0 +1,43 @@
+name: Publish new release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  publish_release:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Salesforce CLI
+      run: |
+        wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+        mkdir sfdx-cli
+        tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+        ./sfdx-cli/install
+    
+    - name: Install jq
+      run: |
+        sudo apt-get install jq
+    
+    - name: Populate auth file
+      shell: bash
+      run: 'echo ${{secrets.DEVHUB_SFDX_URL}} > ./DEVHUB_SFDX_URL.txt'
+    
+    - name: Authenticate Dev Hub
+      run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
+
+    - name: Promote latest version
+      run: |
+        version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
+        sfdx force:package:version:promote -p "$version_id"
+    
+    - name: Tag new release
+      run: |
+        tag_name=$(jq ".packageDirectories[0].versionName" sfdx-project.json)
+        pkg_name=$(jq ".packageDirectories[0].package" sfdx-project.json)
+        git tag -a "$tag_name" -m "$pkg_name $tag_name"
+        git push origin "$tag_name"

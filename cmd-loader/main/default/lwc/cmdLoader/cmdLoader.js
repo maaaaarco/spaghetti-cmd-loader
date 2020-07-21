@@ -13,7 +13,7 @@ import { loadScript } from "lightning/platformResourceLoader";
 import upsertRecords from "@salesforce/apex/CMDLoaderController.upsertRecords";
 import checkDeployment from "@salesforce/apex/CMDLoaderController.checkDeployment";
 
-const MAX_PREVIEW_ROWS = 200;
+const MAX_PREVIEW_ROWS = 250;
 const DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON = {
   body: {
     message:
@@ -29,22 +29,34 @@ export default class CmdLoader extends LightningElement {
 
   @track selectedType;
 
-  @track deployResult = {};
+  @track deployResults = [];
 
   @track csvHasDeveloperName = false;
+  @track csvHasMasterLabel = false;
 
   @track showPreviewAnyway = false;
 
-  @track showLoadingSpinner = false;
+  @track deployCounter = 0;
+
+  @track validationInProgress = false;
+  @track warningMessages = [];
 
   papaParseLoaded = false;
   deploymentId;
   checkDeployIntervalId;
 
+  masterLabelColumn;
+  developerNameColumn;
+
+  get hasAllRequiredColumns() {
+    return (
+      !this.fileParsed || (this.csvHasDeveloperName && this.csvHasMasterLabel)
+    );
+  }
+
   get showPreview() {
     return (
-      this.cmdRecords.length &&
-      (!this.tooManyRowsForPreview || this.showPreviewAnyway)
+      this.fileParsed && (!this.tooManyRowsForPreview || this.showPreviewAnyway)
     );
   }
 
@@ -54,29 +66,27 @@ export default class CmdLoader extends LightningElement {
 
   get disableLoad() {
     return (
-      !this.cmdRecords.length ||
+      !this.fileParsed ||
       !this.selectedType ||
-      !this.csvHasDeveloperName ||
+      !this.hasAllRequiredColumns ||
       this.deploymentId
     );
   }
 
-  get deployResultMessage() {
-    return this.isDeployDone
-      ? this.deployResult.result
-      : "Deployment in progress";
+  get numberOfDeploys() {
+    return Math.ceil(this.cmdRecords.length / MAX_PREVIEW_ROWS);
   }
 
-  get resultThemeClass() {
-    return this.deployResult.done
-      ? this.deployResult.success
-        ? "slds-theme_success"
-        : "slds-theme_error"
-      : "slds-theme_info";
+  get hasWarningMessages() {
+    return (
+      this.fileParsed &&
+      !this.validationInProgress &&
+      this.warningMessages.length
+    );
   }
 
-  get isDeployDone() {
-    return this.deployResult.done;
+  get fileParsed() {
+    return !!this.cmdRecords.length;
   }
 
   renderedCallback() {
@@ -114,9 +124,76 @@ export default class CmdLoader extends LightningElement {
     }
   }
 
+  handleCellChange(event) {
+    const cell = event.detail.draftValues[0];
+    // index in the cmdRecords array
+    const idx = /row-\d+/.test(cell.key) ? cell.key.split("-")[1] : undefined;
+    if (idx) {
+      for (let fieldName in cell) {
+        if (fieldName !== "key") {
+          this.cmdRecords[idx][fieldName] = cell[fieldName];
+        }
+      }
+    }
+
+    this._startValidateRecords();
+  }
+
   enableShowPreviewAnyway(event) {
     event.preventDefault();
     this.showPreviewAnyway = true;
+  }
+
+  loadRecords() {
+    const recordWrappers = [];
+
+    const startIdx = this.deployCounter * MAX_PREVIEW_ROWS;
+
+    if (startIdx >= this.cmdRecords.length) {
+      return; // deployment complete
+    }
+
+    const cmdRecordsToDeploy = this.cmdRecords.slice(
+      startIdx,
+      startIdx + MAX_PREVIEW_ROWS
+    );
+
+    cmdRecordsToDeploy.forEach(cmdRecord => {
+      const recordWrapper = {
+        fields: []
+      };
+
+      this.columns
+        .map(col => col.fieldName)
+        .forEach(field => {
+          recordWrapper.fields.push({
+            fieldName: field,
+            fieldValue: cmdRecord[field]
+          });
+        });
+
+      recordWrappers.push(recordWrapper);
+    });
+
+    upsertRecords({
+      cmdType: this.selectedType,
+      records: recordWrappers
+    })
+      .then(data => {
+        if (data) {
+          this.deploymentId = data;
+          this.deployCounter++;
+          this._startCheckDeployPolling();
+        } else {
+          // it's not clear why this happen since I'd expect the controller to catch it and throw an exception
+          // but it does sometime especially with large CSV file
+          this._dispatchError(DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON);
+          this._clearIntervals();
+        }
+      })
+      .catch(err => {
+        this._dispatchError(err);
+      });
   }
 
   _parseCsvAndDisplayPreview(file) {
@@ -136,89 +213,119 @@ export default class CmdLoader extends LightningElement {
           this.columns.push({
             label: header,
             fieldName: header,
-            type: "text"
+            type: "text",
+            editable: true
           });
 
-          this.csvHasDeveloperName |= /^DeveloperName$/i.test(header);
+          if (/^DeveloperName$/i.test(header)) {
+            this.csvHasDeveloperName = true;
+            this.developerNameColumn = header;
+          }
+
+          if (/^(Master)?Label$/i.test(header)) {
+            this.csvHasMasterLabel = true;
+            this.masterLabelColumn = header;
+          }
         });
       }
 
       this.cmdRecords = parseResult.data;
+      // creates a key field
+      this.cmdRecords.forEach((record, idx) => {
+        record.key = `row-${idx}`;
+      });
+      this._startValidateRecords();
     });
 
     fileReader.readAsText(file);
   }
 
-  loadRecords() {
-    const recordWrappers = [];
+  _startValidateRecords() {
+    if (this.hasAllRequiredColumns) {
+      this.validationInProgress = true;
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
+      setTimeout(() => {
+        this._validateRecords();
+      }, 2000);
+    }
+  }
 
-    this.cmdRecords.forEach(cmdRecord => {
-      const recordWrapper = {
-        fields: []
-      };
+  _validateRecords() {
+    const warnings = [];
 
-      Object.keys(cmdRecord).forEach(field => {
-        recordWrapper.fields.push({
-          fieldName: field,
-          fieldValue: cmdRecord[field]
-        });
-      });
+    // stores a count for each developer name
+    const devNameCount = {};
 
-      recordWrappers.push(recordWrapper);
+    this.cmdRecords.forEach((record, idx) => {
+      const devName = record[this.developerNameColumn];
+      const label = record[this.masterLabelColumn];
+
+      if (!devName) {
+        warnings.push(`Row ${idx + 1} - Developer Name cannot be blank`);
+      } else {
+        if (devNameCount[devName]) {
+          warnings.push(
+            `Row ${idx +
+              1} - Developer Name ${devName} occurs more than one time`
+          );
+        }
+        devNameCount[devName] = 1;
+      }
+
+      if (!label) {
+        warnings.push(`Row ${idx + 1} - Label cannot be blank`);
+      }
     });
 
-    this.showLoadingSpinner = true;
-
-    upsertRecords({
-      cmdType: this.selectedType,
-      records: recordWrappers
-    })
-      .then(data => {
-        if (data) {
-          this.deploymentId = data;
-          this._startCheckDeployPolling();
-        } else {
-          // it's not clear why this happen since I'd expect the controller to catch it and throw an exception
-          // but it does sometime especially with large CSV file
-          this._dispatchError(DEPLOYMENT_FAILED_FOR_UNKNOWN_REASON);
-        }
-        this.showLoadingSpinner = false;
-      })
-      .catch(err => {
-        this._dispatchError(err);
-        this.showLoadingSpinner = false;
-      });
+    this.warningMessages = warnings;
+    this.validationInProgress = false;
   }
 
   _resetState() {
-    this.deployResult = {};
+    this.deployResults = [];
     this.cmdRecords = [];
     this.columns = [];
     this.deploymentId = undefined;
     this.csvHasDeveloperName = false;
+    this.csvHasMasterLabel = false;
     this.showPreviewAnyway = false;
-    this.showLoadingSpinner = false;
+    this.deployCounter = 0;
+    this.warningMessages = [];
+    this.validationInProgress = false;
   }
 
   _startCheckDeployPolling() {
     if (!this.checkDeployIntervalId) {
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
       this.checkDeployIntervalId = setInterval(() => {
         checkDeployment({
           deployId: this.deploymentId
         })
           .then(response => {
-            this.deployResult = response;
+            response.count = this.deployCounter;
+            if (this.deployResults.length != this.deployCounter) {
+              this.deployResults.push(response);
+            } else {
+              this.deployResults[this.deployResults.length - 1] = response;
+            }
             if (response.done) {
-              clearInterval(this.checkDeployIntervalId);
-              this.checkDeployIntervalId = null;
+              // invokes loadRecords in case there are still records to process
+              this.loadRecords();
+              this._clearIntervals();
             }
           })
           .catch(err => {
             this._dispatchError(err);
-            clearInterval(this.checkDeployIntervalId);
-            this.checkDeployIntervalId = null;
+            this._clearIntervals();
           });
       }, 2000);
+    }
+  }
+
+  _clearIntervals() {
+    if (this.checkDeployIntervalId) {
+      clearInterval(this.checkDeployIntervalId);
+      this.checkDeployIntervalId = null;
     }
   }
 
