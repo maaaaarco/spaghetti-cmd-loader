@@ -50,15 +50,13 @@ export default class CmdLoader extends LightningElement {
 
   get hasAllRequiredColumns() {
     return (
-      !this.fileParsed ||
-      (this.csvHasDeveloperName && this.csvHasMasterLabel)
+      !this.fileParsed || (this.csvHasDeveloperName && this.csvHasMasterLabel)
     );
   }
 
   get showPreview() {
     return (
-      this.fileParsed &&
-      (!this.tooManyRowsForPreview || this.showPreviewAnyway)
+      this.fileParsed && (!this.tooManyRowsForPreview || this.showPreviewAnyway)
     );
   }
 
@@ -80,7 +78,11 @@ export default class CmdLoader extends LightningElement {
   }
 
   get hasWarningMessages() {
-    return this.fileParsed && this.warningMessages.length;
+    return (
+      this.fileParsed &&
+      !this.validationInProgress &&
+      this.warningMessages.length
+    );
   }
 
   get fileParsed() {
@@ -122,6 +124,21 @@ export default class CmdLoader extends LightningElement {
     }
   }
 
+  handleCellChange(event) {
+    const cell = event.detail.draftValues[0];
+    // index in the cmdRecords array
+    const idx = /row-\d+/.test(cell.key) ? cell.key.split("-")[1] : undefined;
+    if (idx) {
+      for (let fieldName in cell) {
+        if (fieldName !== "key") {
+          this.cmdRecords[idx][fieldName] = cell[fieldName];
+        }
+      }
+    }
+
+    this._startValidateRecords();
+  }
+
   enableShowPreviewAnyway(event) {
     event.preventDefault();
     this.showPreviewAnyway = true;
@@ -146,12 +163,14 @@ export default class CmdLoader extends LightningElement {
         fields: []
       };
 
-      Object.keys(cmdRecord).forEach(field => {
-        recordWrapper.fields.push({
-          fieldName: field,
-          fieldValue: cmdRecord[field]
+      this.columns
+        .map(col => col.fieldName)
+        .forEach(field => {
+          recordWrapper.fields.push({
+            fieldName: field,
+            fieldValue: cmdRecord[field]
+          });
         });
-      });
 
       recordWrappers.push(recordWrapper);
     });
@@ -194,7 +213,8 @@ export default class CmdLoader extends LightningElement {
           this.columns.push({
             label: header,
             fieldName: header,
-            type: "text"
+            type: "text",
+            editable: true
           });
 
           if (/^DeveloperName$/i.test(header)) {
@@ -210,17 +230,22 @@ export default class CmdLoader extends LightningElement {
       }
 
       this.cmdRecords = parseResult.data;
-      this._startRecordValidation();
+      // creates a key field
+      this.cmdRecords.forEach((record, idx) => {
+        record.key = `row-${idx}`;
+      });
+      this._startValidateRecords();
     });
 
     fileReader.readAsText(file);
   }
 
-  _startRecordValidation() {
+  _startValidateRecords() {
     if (this.hasAllRequiredColumns) {
       this.validationInProgress = true;
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
       setTimeout(() => {
-        this._validateRecords();  
+        this._validateRecords();
       }, 2000);
     }
   }
@@ -236,9 +261,7 @@ export default class CmdLoader extends LightningElement {
       const label = record[this.masterLabelColumn];
 
       if (!devName) {
-        warnings.push(
-          `Row ${idx + 1} - Developer Name cannot be blank`
-        );
+        warnings.push(`Row ${idx + 1} - Developer Name cannot be blank`);
       } else {
         if (devNameCount[devName]) {
           warnings.push(
@@ -273,6 +296,7 @@ export default class CmdLoader extends LightningElement {
 
   _startCheckDeployPolling() {
     if (!this.checkDeployIntervalId) {
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
       this.checkDeployIntervalId = setInterval(() => {
         checkDeployment({
           deployId: this.deploymentId
