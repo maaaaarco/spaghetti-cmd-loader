@@ -49,12 +49,16 @@ public inherited sharing class CMDDeployCallback implements Metadata.DeployCallb
   }
 
   private String parseDeploymentStatus() {
-    String numDeployed = this.result.numberComponentsDeployed != null
-      ? String.valueOf(this.result.numberComponentsDeployed)
-      : '0';
     String numErrors = this.result.numberComponentErrors != null
       ? String.valueOf(this.result.numberComponentErrors)
       : '0';
+
+    // if there's at least one error then none of the components get deployed
+    String numDeployed = numErrors != '0'
+      ? '0'
+      : this.result.numberComponentsDeployed != null
+          ? String.valueOf(this.result.numberComponentsDeployed)
+          : '0';
     return String.format(
       '[{0}] - Deployment done, status: {1}\nComponents deployed: {2}\nErrors: {3}\n',
       new List<String>{
