@@ -9,6 +9,13 @@
  *  Controller class for cmdLoader LWC
  */
 public with sharing class CMDLoaderController {
+  @TestVisible
+  static CMDConnectApiDelegate feedApi = new CMDConnectApiDelegate();
+
+  @TestVisible
+  static CMDMetadataOperationsDelegate deployApi = new CMDMetadataOperationsDelegate();
+
+
   public class RecordWrapper {
     @AuraEnabled
     public List<FieldWrapper> fields { get; set; }
@@ -78,12 +85,7 @@ public with sharing class CMDLoaderController {
     DeploymentStatusWrapper res = new DeploymentStatusWrapper(deployId);
 
     try {
-      for (FeedItem feed : [
-        SELECT Body
-        FROM FeedItem
-        WHERE ParentId = :UserInfo.getUserId() AND CreatedDate = TODAY
-        LIMIT 1000
-      ]) {
+      for (FeedItem feed : feedApi.getTodayFeedItems(UserInfo.getUserId())) {
         // looks for deploymentId value in the chatter post
         if (feed.Body.containsIgnoreCase(deployId)) {
           res.done = true;
@@ -223,7 +225,7 @@ public with sharing class CMDLoaderController {
         container.addMetadata(customMetadataRecord);
       }
 
-      deployJobId = Metadata.Operations.enqueueDeployment(
+      deployJobId = deployApi.enqueueDeployment(
         container,
         new CMDDeployCallback()
       );

@@ -28,7 +28,7 @@ private class CMDDeployCallbackTest {
   }
 
   @IsTest
-  static void handleResultCreatesFeedItemWhenDeployIsSuccessfull() {
+  static void handleResultCreatesFeedItemWhenDeployIsSuccessful() {
     Metadata.DeployResult deployRes = new Metadata.DeployResult();
     deployRes.id = '0Af3N00000UeFZiSAN';
     deployRes.done = true;
@@ -73,7 +73,7 @@ private class CMDDeployCallbackTest {
   }
 
   @IsTest
-  static void handleResultCreatesFeedItemWhenDeployIsUnsuccessfull() {
+  static void handleResultCreatesFeedItemWhenDeployIsUnsuccessful() {
     Metadata.DeployResult deployRes = new Metadata.DeployResult();
     deployRes.id = '0Af3N00000UeFZiSAN';
     deployRes.done = true;
