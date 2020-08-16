@@ -11,9 +11,17 @@
  */
 @NamespaceAccessible
 public inherited sharing class CMDDeployCallback implements Metadata.DeployCallback {
+  @TestVisible
   static final Integer MAX_FAILURES = 20;
 
   Metadata.DeployResult result;
+
+  @TestVisible
+  private CMDConnectApiDelegate feedApi;
+
+  public CMDDeployCallback() {
+    this.feedApi = new CMDConnectApiDelegate();
+  }
 
   public void handleResult(
     Metadata.DeployResult result,
@@ -42,10 +50,7 @@ public inherited sharing class CMDDeployCallback implements Metadata.DeployCallb
     feedItemInput.feedElementType = ConnectApi.FeedElementType.FeedItem;
     feedItemInput.subjectId = result.createdBy;
 
-    ConnectApi.FeedElement feedElement = ConnectApi.ChatterFeeds.postFeedElement(
-      Network.getNetworkId(),
-      feedItemInput
-    );
+    feedApi.postFeedElement(Network.getNetworkId(), feedItemInput);
   }
 
   private String parseDeploymentStatus() {
