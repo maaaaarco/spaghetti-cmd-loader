@@ -27,7 +27,7 @@ jobs:
       run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
 
     - name: Create new version
-      run: 'sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60'
+      run: 'sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60 --codecoverage'
     
     - name: Install new version in Dev Hub
       run: |
