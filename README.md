@@ -21,15 +21,15 @@ Create or Update Custom Metadata Type records from CSV file
 </a>
 
 ## URL (recommended) <a id="installation-url"></a>
-- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003TtxyAAC)
-- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003TtxyAAC)
+- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003Tty8AAC)
+- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003Tty8AAC)
 
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
 ## Unlocked package (recommended) <a id="installation-unlocked-pkg"></a>
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```bash
-sfdx force:package:install --package "04t1t000003TtxyAAC" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
+sfdx force:package:install --package "04t1t000003Tty8AAC" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
