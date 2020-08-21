@@ -1,12 +1,11 @@
-name: PR Validate
+name: Pull Request to Develop
 
 on:
   pull_request:
     branches: [ develop ]
 
 jobs:
-  validate_pr:
-    # The type of runner that the job will run on
+  validate_pull_request:
     runs-on: ubuntu-latest
 
     steps:
