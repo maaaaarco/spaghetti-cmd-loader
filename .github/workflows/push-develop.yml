@@ -27,17 +27,22 @@ jobs:
       run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
 
     - name: Create new version
-      run: 'sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60 --codecoverage'
+      run: |
+        sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60 --codecoverage
+        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
+        echo "::set-env name=version_id::${new_version_id}"
+    
+    - name: Check code coverage
+      run: |
+        test $(sfdx force:package:version:report -p "$version_id" --json | jq .result.HasPassedCodeCoverageCheck) = 'true'
     
     - name: Install new version in Dev Hub
       run: |
-        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
-        sfdx force:package:install -p "$new_version_id" -u devhub --wait 10 --publishwait 10
+        sfdx force:package:install -p "$version_id" -u devhub --wait 10 --publishwait 10
     
     - name: Store new version id
       run: |
-        new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
-        sed -i -e "s/04t[[:alnum:]]\{15\}/${new_version_id}/" README.md
+        sed -i -e "s/04t[[:alnum:]]\{15\}/${version_id}/" README.md
         git config user.name "release[bot]"
         git config user.email "<>"
         git add README.md
