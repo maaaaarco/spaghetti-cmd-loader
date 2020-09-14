@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-Summer_'20-g)
+![release](https://img.shields.io/badge/release-Winter_'21-g)
 
 # Custom Metadata Loader
 Create or Update Custom Metadata Type records from CSV file
