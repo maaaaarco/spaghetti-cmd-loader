@@ -1,7 +1,7 @@
 {
     "namespace": "spaghettiCMD",
     "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "49.0",
+    "sourceApiVersion": "50.0",
     "packageDirectories": [
         {
             "path": "cmd-loader",
