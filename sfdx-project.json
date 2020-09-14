@@ -7,8 +7,8 @@
             "path": "cmd-loader",
             "default": true,
             "package": "Spaghetti CMD",
-            "versionName": "ver 1.1",
-            "versionNumber": "1.1.1.NEXT"
+            "versionName": "ver 1.2",
+            "versionNumber": "1.2.1.NEXT"
         }
     ],
     "packageAliases": {
