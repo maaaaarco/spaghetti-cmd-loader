@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-Summer_'20-g)
+![release](https://img.shields.io/badge/release-Winter_'21-g)
 
 # Custom Metadata Loader
 Create or Update Custom Metadata Type records from CSV file
@@ -12,6 +12,7 @@ Create or Update Custom Metadata Type records from CSV file
   - [CSV columns](#user-guide-csv-cols)
   - [Limitations](#user-guide-limitations)
 - [Demo](#demo)
+- [Contributing](#contributing)
 - [Credits](#credits)
 
 # Installation options <a id="installation"></a>
@@ -78,6 +79,9 @@ For more complex use cases consider that the [Salesforce CLI](https://developer.
 YouTube video:
 
 [![Demo Video](https://img.youtube.com/vi/abYr7B-5vsA/0.jpg)](https://www.youtube.com/watch?v=abYr7B-5vsA)
+
+# Contribute <a id="contributing"></a>
+If you are interested in contributing, please take a look at the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 # Credits <a id="credits"></a>
 - [Papa Parse](https://www.papaparse.com/) for its amazing Javascript CSV parser
