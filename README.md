@@ -1,4 +1,4 @@
-![release](https://img.shields.io/badge/release-Summer_'20-g)
+![release](https://img.shields.io/badge/release-Winter_'21-g)
 
 # Custom Metadata Loader
 Create or Update Custom Metadata Type records from CSV file
@@ -12,6 +12,7 @@ Create or Update Custom Metadata Type records from CSV file
   - [CSV columns](#user-guide-csv-cols)
   - [Limitations](#user-guide-limitations)
 - [Demo](#demo)
+- [Contributing](#contributing)
 - [Credits](#credits)
 
 # Installation options <a id="installation"></a>
@@ -21,15 +22,15 @@ Create or Update Custom Metadata Type records from CSV file
 </a>
 
 ## URL (recommended) <a id="installation-url"></a>
-- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hza1AAA)
-- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000002hza1AAA)
+- [Production/Developer](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003HUFbAAO)
+- [Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04t1t000003HUFbAAO)
 
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
 ## Unlocked package (recommended) <a id="installation-unlocked-pkg"></a>
 You can install this as an Unlocked Package, using the CLI, by running the following command:
 ```bash
-sfdx force:package:install --package "04t1t000002hza1AAA" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
+sfdx force:package:install --package "04t1t000003HUFbAAO" --targetusername YOUR_ORG_ALIAS --wait 10 --publishwait 10
 ```
 This approach is recommended since all components will be deployed using a namespace, removing the chance of failures due to conflicting API names.
 
@@ -72,12 +73,15 @@ This application does not impose any hard limit on the CSV file size or number o
 
 If your CSV file contains more than 250 rows the application will automatically split it into smaller chunks of 250 rows each. Chunks will be loaded sequentially.
 
-In June 11, 2020 the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) released a bunch of new commands to work with Custom Metadata Types. Among these there's one that allows records creation from a CSV file. Check them out [here](https://github.com/forcedotcom/cli/blob/master/releasenotes/v48.md#48181-june-11-2020).
+For more complex use cases consider that the [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm) has a bunch of commands to work with Custom Metadata Types. Check them out [here](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_force_cmdt.htm#cli_reference_force_cmdt).
 
 # Demo <a id="demo"></a>
 YouTube video:
 
 [![Demo Video](https://img.youtube.com/vi/abYr7B-5vsA/0.jpg)](https://www.youtube.com/watch?v=abYr7B-5vsA)
+
+# Contribute <a id="contributing"></a>
+If you are interested in contributing, please take a look at the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 # Credits <a id="credits"></a>
 - [Papa Parse](https://www.papaparse.com/) for its amazing Javascript CSV parser

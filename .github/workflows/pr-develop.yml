@@ -1,12 +1,11 @@
-name: PR Validate
+name: Pull Request to Develop
 
 on:
   pull_request:
     branches: [ develop ]
 
 jobs:
-  validate_pr:
-    # The type of runner that the job will run on
+  validate_pull_request:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +17,10 @@ jobs:
         mkdir sfdx-cli
         tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
         ./sfdx-cli/install
+    
+    - name: Install jq
+      run: |
+        sudo apt-get install jq
     
     - name: Populate auth file
       shell: bash
@@ -31,6 +34,12 @@ jobs:
     
     - name: Push source to scratch org
       run: 'sfdx force:source:push'
+    
+    - name: Check code coverage
+      run: |
+        sfdx force:apex:test:run --codecoverage --resultformat json --synchronous --testlevel RunLocalTests --wait 10 > tests.json
+        coverage=$(jq .result.summary.orgWideCoverage tests.json | grep -Eo "[[:digit:]]+")
+        test $coverage -ge 75
     
     - name: Delete scratch org
       if: always()
