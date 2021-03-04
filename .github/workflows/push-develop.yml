@@ -30,7 +30,7 @@ jobs:
       run: |
         sfdx force:package:version:create -x -p "Spaghetti CMD" -w 60 --codecoverage
         new_version_id=$(grep -o "04t[[:alnum:]]\{15\}" sfdx-project.json | tail -n1)
-        echo "::set-env name=version_id::${new_version_id}"
+        echo "version_id=${new_version_id}" >> $GITHUB_ENV
     
     - name: Check code coverage
       run: |
