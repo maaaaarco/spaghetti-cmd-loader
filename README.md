@@ -1,7 +1,7 @@
 ![release](https://img.shields.io/badge/release-Winter_'21-g)
 
 # Custom Metadata Loader
-Create or Update Custom Metadata Type records from CSV file
+Create or Update Custom Metadata Type records from CSV file. [Read more](https://spaghetti.dev/Unlocked-packages-and-GitHub-actions/) about this project.
 
 - [Installation options](#installation)
   - [Url](#installation-url)
